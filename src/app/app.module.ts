@@ -14,6 +14,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { CaptchaLoginComponent } from './login/captcha-login/captcha-login.component';
 import { HomeComponent } from './home/home.component';
+import { SideNavComponent } from './side-nav/side-nav.component';
+import { UserInfoComponent } from './user-info/user-info.component';
+import { ChatComponent } from './chat/chat.component';
 
 registerLocaleData(zh);
 
@@ -22,7 +25,10 @@ registerLocaleData(zh);
     AppComponent,
     LoginComponent,
     CaptchaLoginComponent,
-    HomeComponent
+    HomeComponent,
+    SideNavComponent,
+    UserInfoComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,20 @@
+<div class="left-part">
+    <div class="logo">
+        <img src="assets/icon-white.png" >
+    </div>
+    <div *ngFor="let item of items; let i = index" class="path-item" (click)="toggleState(i)">
+        <img 
+          [src]="item.isOn ? item.hoverImg : item.img" 
+          
+          (mouseenter)="item.isOn = true"
+          (mouseleave)="item.isOn = selectedIndex === i"
+        >
+        <span [ngClass]="{'color-on': item.isOn && selectedIndex === i, 'color-off': !(item.isOn && selectedIndex === i)}">{{item.name}}</span>
+        <div *ngIf="item.isOn &&selectedIndex === i" class="color-green"></div>
+      </div>
+      <div class="bottom-box">
+        <div class="balance"><span>余额</span><span>9999w</span></div>
+        <div class="user-avatar"><img src="assets/avatar.png" alt=""></div>
+        <div class="vip"><span class="vip-status">专业版</span></div>
+      </div>
+</div>
