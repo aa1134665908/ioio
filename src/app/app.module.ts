@@ -17,6 +17,10 @@ import { HomeComponent } from './home/home.component';
 import { SideNavComponent } from './side-nav/side-nav.component';
 import { UserInfoComponent } from './user-info/user-info.component';
 import { ChatComponent } from './chat/chat.component';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+
+
 
 registerLocaleData(zh);
 
@@ -35,8 +39,10 @@ registerLocaleData(zh);
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    NzToolTipModule,
     BrowserAnimationsModule,
-    NzSegmentedModule
+    NzSegmentedModule,
+    NzCheckboxModule
   ],
   providers: [
     { provide: NZ_I18N, useValue: zh_CN }

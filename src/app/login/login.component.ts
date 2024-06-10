@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
 // import{CaptchaLoginComponent}from '../login/captcha-login/captcha-login.component'
 
 @Component({
@@ -13,10 +14,12 @@ export class LoginComponent implements OnInit {
   isShowingSeeImage = false;
   placeholderText:string='请输入密码'
   isCaptchaVisible: number = 0;
+  checked = true;
 
   constructor(private router:Router) { }
 
   ngOnInit(): void {
+    
   }
 
   options = ['密码登录', '验证码登录'];

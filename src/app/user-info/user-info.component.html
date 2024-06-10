@@ -1,1 +1,23 @@
-<p>user-info works!</p>
+<div class="user-info-container">
+    <div class="user-info" [@sideNavAnimation]="isSideNavCollapsed ? 'collapsed' : 'expanded'">
+        <div class="info-heard">
+            <div class="conversation-menu-box">
+                <img src="../../assets/icn-menu.svg" alt="" style="margin-right: 12px; margin-top: 2px; height: 26px; width: 26px;">
+            </div>
+            <div class="chat-title">
+                Chat
+            </div>
+        </div>
+        <div class="create-chat">
+            <img src="../../assets/cross.svg" alt="" style="width: 14px; margin-right: 12px; ">
+            <span>新建对话</span>
+        </div>
+    </div>
+    <div *ngIf="isSideNavCollapsed===false" class="SideNavCollapsed" (click)="toggleSideNav()" 
+     nzTooltipTitle="收起侧边栏" nzTooltipPlacement="right" nz-tooltip
+          >
+    </div>
+    <div *ngIf="isSideNavCollapsed===true" class="SideNavCollapsed" (click)="toggleSideNav()" 
+      nzTooltipTitle="展开侧边栏" nzTooltipPlacement="right" nz-tooltip  >
+    </div>
+</div>

@@ -8,8 +8,8 @@
                 <a routerLink="/register">立即注册</a>
             </div>
             <div class="login-scene-box">
-                <nz-segmented class="login-scene-box-box" [nzOptions]="options" (nzValueChange)="handleIndexChange($event)"
-                    nzBlock="true"></nz-segmented>
+                <nz-segmented class="login-scene-box-box" [nzOptions]="options"
+                    (nzValueChange)="handleIndexChange($event)" nzBlock="true"></nz-segmented>
             </div>
 
             <form class="login-input" (submit)="onSubmit()">
@@ -28,36 +28,35 @@
                     </div>
 
                 </div>
-                <div class="ant-checkbox">
-                    <label>
-                        <input type="checkbox" id="check-box" name="check-box" checked>
-                        <span>记住账号</span>
+                <div class="ui-checkbox">
+                    <label class="custom-checkbox">
+                        <label nz-checkbox [(ngModel)]="checked">记住账号</label>
                     </label>
                     <a *ngIf="isCaptchaVisible===0">忘记密码？</a>
-                    
                 </div>
-                
+
                 <button type="submit" class="login-button"><span class="login-text">登录</span></button>
             </form>
 
         </div>
         <div class="footer">
-            <div class="footer-info" >
+            <div class="footer-info">
                 <span style="padding-right: 0.3em;">点击「登录」表示已阅读并同意</span>
                 <a href="#" style="padding: 0 8px 0 12px;border-right: 1px solid #e4eaed">服务协议</a>
                 <a href="#" style="padding: 0 0.5em;">隐私政策</a>
             </div>
             <div class="footer-section" style="margin-top: 0px;">
-                <span style="padding: 0 0.5em;border-right: 1px solid #e4eaed;">Ⓒ 2023 清远墨海科技有限公司 All rights reserved.</span>
+                <span style="padding: 0 0.5em;border-right: 1px solid #e4eaed;">Ⓒ 2023 清远墨海科技有限公司 All rights
+                    reserved.</span>
                 <div class="align-item-center" style="padding: 0 0.5em;border-right: 1px solid #e4eaed;">
                     <img src="assets/police.png" alt="" style=" height: 1.5em; margin-right: 0.2em;">
-                    <a rel="noreferrer" target="_blank" 
+                    <a rel="noreferrer" target="_blank"
                         href="https://beian.mps.gov.cn/#/query/webSearch?code=44180202000748">
                         <span class="text-small">粤公网安备44180202000748</span>
                     </a>
                 </div>
-                <a  href="https://beian.miit.gov.cn/#/Integrated/recordQuery"
-                    rel="noreferrer" target="_blank"style="padding: 0 0.5em;"><span >粤ICP备2023143228号-1</span></a>
+                <a href="https://beian.miit.gov.cn/#/Integrated/recordQuery" rel="noreferrer" target="_blank"
+                    style="padding: 0 0.5em;"><span>粤ICP备2023143228号-1</span></a>
             </div>
         </div>
 
