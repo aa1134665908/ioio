@@ -1,1 +1,40 @@
-<p>chat works!</p>
+<div class="right-part">
+    <div class="header-box">
+        <div class="header-title-box">
+            <nz-segmented class="header-title" [nzOptions]="options" (nzValueChange)="handleIndexChange($event)"
+                nzBlock="true">
+
+            </nz-segmented>
+
+        </div>
+        <div class="model-name">
+            <span *ngIf="isCaptchaVisible===0">gpt-3.5-turbo（默认）</span>
+            <span *ngIf="isCaptchaVisible===1">gpt-4o</span>
+        </div>
+        <img src="../../assets/icn_gpt3.5_off.png" alt="" class="gpt35-img"
+            [ngClass]="{'gpt35-img-on':isCaptchaVisible===0}">
+        <img src="../../assets/icn_gpt4_turbo_off.png" alt="" class="gpt4-img"
+            [ngClass]="{'gpt4-img-on':isCaptchaVisible===1}">
+    </div>
+    <div class="chat-background-box">
+        <div class="chat-background">
+            <img src="../../assets/oioi.png" alt="" class="ioio">
+            <img src="../../assets/plus-opacity.png" alt="" class="pro">
+        </div>
+    </div>
+
+    <div class="bottom">
+        <div class="chat-input">
+            <textarea nz-input placeholder="输入内容，Shift + Enter 换行" [nzAutosize]="{ minRows: 1, maxRows: 6 }"
+                [nzBorderless]="true" [(ngModel)]="content"></textarea>
+            <div *ngIf="content===''" class="submit-img submit-img-disabled"  >
+                <img src="../../assets/arrow.svg">
+            </div>
+            <div *ngIf="content!==''" class="submit-img" (click)="onSubmit()" >
+                <img src="../../assets/arrow.svg">
+            </div>
+        </div>
+
+    </div>
+    <div class="statement">IOIO 基于 AI 技术生成内容的准确性和完整性无法保证，不代表我们的态度和观点。</div>
+</div>

@@ -1,0 +1,211 @@
+.right-part {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.header-box {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 32px;
+    flex-direction: column;
+}
+
+.header-title-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 48px;
+    width: 268px;
+    margin-top: 12PX;
+}
+
+.header-title {
+    flex: 1;
+    outline: none;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #EBF0F2;
+}
+
+:host::ng-deep.ant-segmented-item-label {
+    height: 40px;
+    // padding: 4px; 
+    line-height: 40px;
+    border-radius: 6px;
+    padding-left: 35px;
+    color: #9aa3b3;
+
+}
+
+:host::ng-deep.ant-segmented-item-selected {
+
+
+    border-radius: 6px;
+    box-shadow: none;
+
+}
+
+:host::ng-deep .ng-trigger-thumbMotion {
+    border-radius: 6px;
+}
+
+
+
+
+.gpt35-img {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 1021px;
+    top: 40px;
+
+}
+
+
+.gpt35-img:hover {
+    filter: brightness(0) saturate(100%) invert(71%) sepia(17%) saturate(1354%) hue-rotate(137deg) brightness(89%) contrast(90%);
+}
+
+.gpt35-img-on {
+    filter: brightness(0) saturate(100%) invert(71%) sepia(17%) saturate(1354%) hue-rotate(137deg) brightness(89%) contrast(90%);
+}
+
+
+:host::ng-deep .ant-segmented-item-selected .ant-segmented-item-label,
+:host::ng-deep .ant-segmented-item-label:hover {
+    color: #0f1728;
+
+}
+
+.gpt4-img {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    right: 1076px;
+    top: 40px;
+}
+
+.gpt4-img:hover {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1854%) hue-rotate(247deg) brightness(115%) contrast(88%);
+}
+
+.gpt4-img-on {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1854%) hue-rotate(247deg) brightness(115%) contrast(88%);
+}
+
+
+.model-name {
+    margin-top: 12px;
+    margin-left: 4px;
+    color: #9aa3b3;
+}
+
+.chat-background-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 250px);
+    padding-top: 4px;
+    //   padding-bottom: 32px;
+    //   overflow-x: hidden;
+    //   overflow-y: scroll;
+    //   margin-bottom: -150px;
+}
+
+.ioio {
+    height: 45px;
+    width: 103px;
+    transform: rotate(180deg);
+}
+
+.pro {
+
+    // align-items: center;
+    height: 26.28px;
+    width: 46px;
+    border-radius: 2px;
+}
+
+.chat-background {
+    display: flex;
+    align-items: center;
+    opacity: .6;
+}
+
+.bottom {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    flex: 1;
+    padding-top: 50px;
+}
+
+
+.chat-input {
+  position: relative;
+  border: 1px solid #cad5e8;
+  max-width: 768px;
+  border-radius: 12px;
+  background: #ffffff;
+  margin-right: 8px;
+  padding-left: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 添加这行 */
+  min-height: 54px; /* 添加这行 */
+  max-height: 346px;
+  
+}
+
+textarea {
+  resize: none;
+  overflow-y: hidden;
+  min-height: 52px;
+}
+
+.ant-input {
+  width: 766px;
+  line-height: 22px;
+  border-radius: 8px;
+  font-size: 16px;
+  box-shadow: none;
+  background: transparent;
+  padding-top: 16px;
+}
+
+.ant-input::placeholder{
+    color: #C3C8D1;
+}
+
+.statement{
+    // height: 30px;
+    color: #9aa3b3;
+    text-align: center;
+    padding: 8px 0;
+    padding-right: 8px;
+    line-height: 16px;
+    font-size: 12px;
+}
+.submit-img{
+    display: flex;
+    width: 32px;
+    height: 32px;
+    padding: 10px;
+    background: #0f1728;
+    border-radius: 8px;
+    
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor:pointer
+    
+}
+
+.submit-img-disabled{
+    opacity: .1;
+    cursor: default;
+}
