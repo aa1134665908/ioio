@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-side-nav',
@@ -36,8 +37,11 @@ export class SideNavComponent implements OnInit {
     }
   }
 
+  createMessage(msg:string):void{
+    this.message.create('error',msg)
+  }
 
-  constructor() { }
+  constructor(private message: NzMessageService) { }
 
   ngOnInit(): void {
   }

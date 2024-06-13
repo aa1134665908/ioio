@@ -14,8 +14,8 @@
         <div *ngIf="item.isOn &&selectedIndex === i" class="color-green"></div>
       </div>
       <div class="bottom-box">
-        <div class="balance" nzTooltipTitle="剩余额度" nzTooltipPlacement="right" nz-tooltip><span>余额</span><span>9999w</span></div>
-        <div class="user-avatar" nzTooltipTitle="更多" nzTooltipPlacement="right" nz-tooltip><img src="assets/avatar.png" alt=""></div>
-        <div class="vip" nzTooltipTitle="查看权益" nzTooltipPlacement="right" nz-tooltip><span class="vip-status">专业版</span></div>
+        <div class="balance" nzTooltipTitle="剩余额度" nzTooltipPlacement="right" nz-tooltip nz-button (click)="createMessage('暂时未开发')"><span>余额</span><span>9999w</span></div>
+        <div class="user-avatar" nzTooltipTitle="更多" nzTooltipPlacement="right" nz-tooltip (click)="createMessage('暂时未开发')"><img src="assets/avatar.png" alt=""></div>
+        <div class="vip" nzTooltipTitle="查看权益" nzTooltipPlacement="right" nz-tooltip><span class="vip-status" (click)="createMessage('暂时未开发')">专业版</span></div>
       </div>
 </div>

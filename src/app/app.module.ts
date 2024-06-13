@@ -20,6 +20,8 @@ import { ChatComponent } from './chat/chat.component';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { ChatDetailComponent } from './chat-detail/chat-detail.component';
+import { NzMessageModule } from 'ng-zorro-antd/message';
 
 
 
@@ -33,7 +35,8 @@ registerLocaleData(zh);
     HomeComponent,
     SideNavComponent,
     UserInfoComponent,
-    ChatComponent
+    ChatComponent,
+    ChatDetailComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +47,8 @@ registerLocaleData(zh);
     BrowserAnimationsModule,
     NzSegmentedModule,
     NzCheckboxModule,
-    NzInputModule
+    NzInputModule,
+    NzMessageModule
   ],
   providers: [
     { provide: NZ_I18N, useValue: zh_CN }
