@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject ,BehaviorSubject} from 'rxjs';
+import { Observable,BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,30 +16,27 @@ export class ChatService {
     const data = {
       "messages": messages,
       "model": "deepseek-chat",
-     
+      "frequency_penalty": 0,
       "max_tokens": 2048,
-      
+      "presence_penalty": 0,
       "stop": null,
-      "stream": true,
-      
+      "stream": false,
+      "temperature": 1,
+      "top_p": 1,
+      "logprobs": false,
+      "top_logprobs": null
     };
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
+      'Accept': 'application/json',
       'Authorization': 'Bearer sk-e7a82dd7b0a4471b8705fea2608fd60e'
     });
-    console.log('Sending message:', messages);
-    return this.http.post(this.apiUrl, data, { headers, responseType: 'text' });
+    
+    return this.http.post(this.apiUrl, data, { headers });
   }
 
-  updateMessage(messagePart: string) {
-    console.log('Updating message:', messagePart);
-    this.messageSubject.next(this.messageSubject.getValue() + messagePart);
-  }
-
-  clearMessage() {
-    console.log('Clearing message');
-    this.messageSubject.next('');
+  setMessage(message: string) {
+    this.messageSubject.next(message);
   }
 }

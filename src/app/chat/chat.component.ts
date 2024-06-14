@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpEvent, HttpEventType } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-chat',
@@ -9,13 +10,15 @@ import { HttpClient, HttpHeaders, HttpEvent, HttpEventType } from '@angular/comm
   styleUrls: ['./chat.component.less']
 })
 export class ChatComponent implements OnInit {
-  content: string = "";
+  content: string = ""
   showChatDetail = false;
   isCaptchaVisible: number = 0;
-  options = ["GPT-3.5", "GPT-4"];
+
+  options = ["GPT-3.5", "GPT-4"]
+
+
   private enterPressCount = 0;
-  private messageId: string = '';
-  private messageContent: string = '';
+
   onEnterPress(event: Event, textareaRef: HTMLTextAreaElement) {
     const keyboardEvent = event as KeyboardEvent;
 
@@ -56,11 +59,9 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  // ... 其他代码保持不变
-
   sendMessage() {
     const tempContent = this.content;
-    this.content = '';
+    this.content = ''
     const messages = [
       {
         "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
@@ -73,31 +74,29 @@ export class ChatComponent implements OnInit {
     ];
 
     this.showChatDetail = true;
-  this.chatService.clearMessage();
 
-  this.chatService.sendMessage(messages).subscribe(
-    (response) => {
-      console.log('Response received:', response);
-      const lines = response.split('\n');
-      lines.forEach((line: string) => {
-        if (line.startsWith('data:')) {
-          const data = line.substring(5).trim();
-          if (data !== '[DONE]') {
-            const chunk = JSON.parse(data);
-            if (chunk.id) {
-              this.messageId = chunk.id;
-              this.router.navigate([this.messageId], { relativeTo: this.route });
-            }
-            if (chunk.choices[0].delta.content) {
-              this.chatService.updateMessage(chunk.choices[0].delta.content);
-            }
-          }
-        }
-      });
-    },
-    (error) => {
-      console.error('Error occurred:', error);
-    }
-  );
-}
+
+    let isNavigated = false; // 添加一个标志变量
+
+
+
+    this.chatService.sendMessage(messages).subscribe(
+      (response) => {
+        const messageId = response.id;
+        this.router.navigate([messageId], { relativeTo: this.route });
+        this.content=''
+        this.chatService.setMessage(response.choices[0].message.content);
+        console.log(response);
+        console.log(response.choices[0].message.content);
+        // 处理响应数据
+      },
+      (error) => {
+        console.error(error);
+        // 处理错误
+      }
+    );
+  }
+
+
+
 }
