@@ -2,6 +2,7 @@ import { Component, OnInit, } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpEvent, HttpEventType } from '@angular/common/http';
+import { ChatdataService } from '../chatdata.service';
 
 
 @Component({
@@ -40,7 +41,7 @@ export class ChatComponent implements OnInit {
   }
 
   handleIndexChange(event: any) {
-    console.log(event);
+    // console.log(event);
     this.isCaptchaVisible = event
   }
 
@@ -48,19 +49,22 @@ export class ChatComponent implements OnInit {
     return true
   }
 
-  onSubmit() {
-    console.log(this.content);
+  // onSubmit() {
+  //   console.log(this.content);
 
-  }
+  // }
 
 
 
-  constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute,private chatDataService:ChatdataService) { }
 
   ngOnInit(): void {
   }
   sendMessage() {
     const tempContent = this.content;
+    // console.log(1111111111111111111111111111111);
+    
+    this.chatDataService.setInputData(this.content)
     this.content = ''
     const messages = [
       {
@@ -75,19 +79,14 @@ export class ChatComponent implements OnInit {
 
     this.showChatDetail = true;
 
-
-    let isNavigated = false; // 添加一个标志变量
-
-
-
     this.chatService.sendMessage(messages).subscribe(
       (response) => {
         const messageId = response.id;
         this.router.navigate([messageId], { relativeTo: this.route });
         this.content=''
         this.chatService.setMessage(response.choices[0].message.content);
-        console.log(response);
-        console.log(response.choices[0].message.content);
+        // console.log(response);
+        // console.log(response.choices[0].message.content);
         // 处理响应数据
       },
       (error) => {

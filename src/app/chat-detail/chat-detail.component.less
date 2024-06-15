@@ -1,0 +1,174 @@
+::-webkit-scrollbar{
+    height: 1rem;
+    width: 0.5rem;
+    background-color: #c9ccd0b3;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: #c9ccd0b3;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track{
+    background-color: transparent;
+    border-radius: 9999px;
+    background: #ffffff;
+}
+
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .chat-title {
+    padding: 12px 32px;
+    border-bottom: #e4eaed 0.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .model-title img {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
+  
+  .main {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .message-container {
+    margin-top: 24px;
+    padding-top: 8px;
+  }
+  
+  .message-content {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+
+  }
+  
+  .chat-message {
+  margin-bottom: 10px;
+  min-height: 20px;
+//   max-height: 200px;
+//   overflow-y: auto;
+  white-space: pre-wrap; /* 或者使用 white-space: nowrap; */
+  max-width: 768px; /* 根据需要调整最大宽度 */
+  
+  }
+
+  .msg-box{
+    // width: calc(100% - 50px);
+    width: 100%;
+    margin-left: 12px;
+    padding-bottom: 38px;
+  }
+
+  .ioio-img img{
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .QA-role{
+    margin-bottom: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+  
+  .meg-content{
+    margin-left: 12px;
+    padding-bottom: 38px;
+  }
+  .question ,.answer{
+    display: flex;
+  }
+
+
+
+.bottom {
+    // height: 80px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    
+    padding-top: 50px;
+    // margin-bottom: 20px;
+}
+
+
+.chat-input {
+  position: relative;
+  border: 1px solid #cad5e8;
+  max-width: 768px;
+  border-radius: 12px;
+  background: #ffffff;
+  margin-right: 8px;
+  padding-left: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 添加这行 */
+  min-height: 54px; /* 添加这行 */
+  max-height: 346px;
+  
+}
+
+textarea {
+  resize: none;
+  overflow-y: hidden;
+  min-height: 52px;
+}
+
+.ant-input {
+  width: 766px;
+  line-height: 22px;
+  border-radius: 8px;
+  font-size: 16px;
+  box-shadow: none;
+  background: transparent;
+  padding-top: 16px;
+}
+
+.ant-input::placeholder{
+    color: #C3C8D1;
+}
+
+.statement{
+    // height: 30px;
+    color: #9aa3b3;
+    text-align: center;
+    padding: 8px 0;
+    padding-right: 8px;
+    line-height: 16px;
+    font-size: 12px;
+}
+.submit-img{
+    display: flex;
+    width: 32px;
+    height: 32px;
+    padding: 10px;
+    background: #0f1728;
+    border-radius: 8px;
+    
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor:pointer
+    
+}
+
+.submit-img-disabled{
+    opacity: .1;
+    cursor: default;
+}

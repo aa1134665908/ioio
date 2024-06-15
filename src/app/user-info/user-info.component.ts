@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-
+import { Router,} from '@angular/router';
 
 @Component({
   selector: 'app-user-info',
@@ -28,12 +28,16 @@ export class UserInfoComponent implements OnInit {
   
 
 
-  constructor() { }
+  constructor(private router:Router) { }
 
   ngOnInit(): void {
   }
 
   toggleSideNav(): void {
     this.isSideNavCollapsed = !this.isSideNavCollapsed;
+  }
+
+  new_chat():void{
+    this.router.navigate(['/chat'])
   }
 }
