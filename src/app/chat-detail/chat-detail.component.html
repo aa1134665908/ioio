@@ -10,7 +10,7 @@
   <div class="main">
     <div class="message-container">
       <div class="message-content">
-        <div class="chat-message" *ngFor="let message of messages">
+        <div class="chat-message" *ngFor="let message of items$ |async; trackBy: trackByFn">
 
           <div *ngIf="message.type === 'question'&& message.content!==''" class="question">
             <div class="ioio-img"><img src="assets/avatar.png" alt=""></div>

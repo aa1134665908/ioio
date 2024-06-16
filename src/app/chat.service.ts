@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable,BehaviorSubject } from 'rxjs';
 
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -9,6 +11,10 @@ export class ChatService {
   private apiUrl = 'https://api.deepseek.com/chat/completions';
   private messageSubject = new BehaviorSubject<string>('');
   message$ = this.messageSubject.asObservable();
+
+
+  
+
   
   constructor(private http: HttpClient) { }
 

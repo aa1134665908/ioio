@@ -4,6 +4,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpEvent, HttpEventType } from '@angular/common/http';
 import { ChatdataService } from '../chatdata.service';
 
+interface Message {
+  content: string;
+  type: 'question' | 'answer';
+}
 
 @Component({
   selector: 'app-chat',
@@ -60,11 +64,24 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+
+  addItem(content:string,type:'question'|'answer') {
+    const newMessage: Message = 
+    {
+      content: content, // 固定内容
+      type: type
+    }; // 创建新项
+    this.chatDataService.addItem(newMessage); // 调用服务的方法添加新项
+  }
+
   sendMessage() {
     const tempContent = this.content;
-    // console.log(1111111111111111111111111111111);
+    console.log(1111111111111111111111111111111);
     
-    this.chatDataService.setInputData(this.content)
+    // this.chatDataService.setInputData(this.content)
+    this.addItem(tempContent,'question')
+    console.log(2222222222222222222222222222222);
     this.content = ''
     const messages = [
       {
@@ -84,7 +101,8 @@ export class ChatComponent implements OnInit {
         const messageId = response.id;
         this.router.navigate([messageId], { relativeTo: this.route });
         this.content=''
-        this.chatService.setMessage(response.choices[0].message.content);
+        this.addItem(response.choices[0].message.content,'answer')
+        // this.chatService.setMessage(response.choices[0].message.content);
         // console.log(response);
         // console.log(response.choices[0].message.content);
         // 处理响应数据
