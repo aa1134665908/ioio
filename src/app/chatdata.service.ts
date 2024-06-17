@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject,map } from 'rxjs';
 
 interface Message {
   content: string;
   type: 'question' | 'answer';
 }
+
+interface GroupedMessages {
+  [id: string]: Message[];
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,23 +19,32 @@ export class ChatdataService {
   constructor() { }
 
 
-  private itemsSubject = new BehaviorSubject<Message[]>([]);
+  private itemsSubject = new BehaviorSubject<GroupedMessages>({});
   items$ = this.itemsSubject.asObservable();
-  
-  addItem(item: Message) {
-    const currentItems = this.itemsSubject.value; // 获取当前的项列表
-    this.itemsSubject.next([...currentItems, item]); // 添加新项并广播更新
-  }
-  // private inputData :string=''
 
-  // setInputData(data:string):void{
-  //   // console.log('this.inputData111',this.inputData);
-    
-  //   this.inputData=data
-  // }
-  // getInputData(): string {
-  //   // console.log('this.inputData:22222',this.inputData);
-    
-  //   return this.inputData;
-  // }
+  addItem(id: string, item: Message) {
+    const currentItems = this.itemsSubject.value;
+    const groupedItems = {
+      ...currentItems,
+      [id]: [...(currentItems[id] || []), item]
+    };
+    this.itemsSubject.next(groupedItems);
+  }
+
+  resetItems() {
+    this.itemsSubject.next({});
+  }
+
+  getItemsById(id: string) {
+    return this.items$.pipe(
+      map(groupedItems => groupedItems[id] || [])
+    );
+  }
+
+  getIds() {
+    return this.items$.pipe(
+      map(groupedMessages => Object.keys(groupedMessages))
+    );
+  }
+
 }

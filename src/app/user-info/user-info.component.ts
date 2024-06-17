@@ -1,7 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router,} from '@angular/router';
+import { ChatdataService } from '../chatdata.service';
+import { Observable,map } from 'rxjs';
 
+
+interface Message {
+  content: string;
+  type: 'question' | 'answer';
+}
 @Component({
   selector: 'app-user-info',
   templateUrl: './user-info.component.html',
@@ -23,12 +30,20 @@ import { Router,} from '@angular/router';
 })
 export class UserInfoComponent implements OnInit {
   isSideNavCollapsed: boolean = false;
+  ids$: Observable<string[]>;
   
-  
+  selectedIndex: number = -1;
+
+  onItemClick(index: number,id: string) {
+    this.selectedIndex = index;
+    this.router.navigate(['/chat', id]);
+  }
   
 
 
-  constructor(private router:Router) { }
+  constructor(private router:Router,public chatDataService:ChatdataService) { 
+    this.ids$=this.chatDataService.getIds();
+  }
 
   ngOnInit(): void {
   }
@@ -40,4 +55,6 @@ export class UserInfoComponent implements OnInit {
   new_chat():void{
     this.router.navigate(['/chat'])
   }
+
+  
 }

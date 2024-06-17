@@ -3,7 +3,7 @@ import { ChatComponent } from '../chat/chat.component'
 import { Router, ActivatedRoute } from '@angular/router';
 import { ChatService } from '../chat.service';
 import { ChatdataService } from '../chatdata.service';
-import { Observable } from 'rxjs';
+import { Observable,map,Subscription, of } from 'rxjs';
 
 interface Message {
   content: string;
@@ -19,33 +19,49 @@ interface Message {
 export class ChatDetailComponent implements OnInit {
 
   content: string = ''
-  messageContent: string = '';
+  // messageContent: string = '';
   moduleTitle: string = ''
-  messages: Message[] = []
-  msgContent: string = ''
-  question: string = ''
+  // messages: Message[] = []
+  // msgContent: string = ''
+  // question: string = ''
+  private routeSubscription: Subscription = new Subscription(); // 新增的订阅变量
+  items$: Observable<Message[]> = of([]);
 
-  items$: Observable<Message[]>;
 
+  constructor(private chatService: ChatService, private chatComponent: ChatComponent, private changeDetector: ChangeDetectorRef, private chatDataService: ChatdataService,private route: ActivatedRoute,) {
+    // this.items$ = this.chatDataService.items$.pipe(
+    //   map(groupedMessages => {
+    //     const id = this.route.snapshot.params['id'];
+    //     return groupedMessages[id] || [];
+    //   })
+    // );
 
-  constructor(private chatService: ChatService, private chatComponent: ChatComponent, private changeDetector: ChangeDetectorRef, private chatDataService: ChatdataService) {
-    this.items$=this.chatDataService.items$
+    // this.items$ = this.route.paramMap.pipe(
+    //   map(params => {
+    //     const id = params.get('id');
+    //     return this.chatDataService.getItemsById(id);
+    //   }),
+    //   map(items => items || [])
+    // );
+    
    }
+
+   private updateComponentForNewId(id: string) {
+    // 更新组件数据
+    this.items$ = this.chatDataService.items$.pipe(
+      map(groupedMessages => {
+        return groupedMessages[id] || [];
+      })
+    );
+  }
 
   ngOnInit(): void {
 
-    // this.onQuestionReceived(this.chatDataService.getInputData())
-    console.log(this.messages);
-    // console.log(111,this.chatComponent.content);
+    this.routeSubscription = this.route.params.subscribe(params => {
+      const id = params['id'];
+      this.updateComponentForNewId(id);
+    });
 
-    this.chatService.message$.subscribe(
-      (messagePart) => {
-        console.log('Message part received in ChatDetailComponent:', messagePart);
-        this.onAnswerReceived(messagePart)
-        // this.messageContent = messagePart;
-        this.changeDetector.detectChanges();
-      }
-    );
     this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
 
 
@@ -73,28 +89,30 @@ export class ChatDetailComponent implements OnInit {
   }
 
 
-  addMessage(content: string, type: 'question' | 'answer') {
-    const message: Message = { content: content, type: type };
-    this.messages.push(message);
-  }
+  // addMessage(content: string, type: 'question' | 'answer') {
+  //   const message: Message = { content: content, type: type };
+  //   this.messages.push(message);
+  // }
 
-  onQuestionReceived(questionContent: string) {
-    this.addMessage(questionContent, 'question');
-  }
+  // onQuestionReceived(questionContent: string) {
+  //   this.addMessage(questionContent, 'question');
+  // }
 
-  onAnswerReceived(answerContent: string) {
-    this.addMessage(answerContent, 'answer');
-  }
+  // onAnswerReceived(answerContent: string) {
+  //   this.addMessage(answerContent, 'answer');
+  // }
 
   ngOnDestroy() {
+    this.routeSubscription.unsubscribe(); // 取消订阅，避免内存泄漏
     this.chatComponent.showChatDetail = false;
   }
 
+ 
 
   sendMessage() {
     const tempContent = this.content;
     // console.log(1111111111111111111111111111111);
-    this.addItem(tempContent)
+    this.addItem(tempContent,'question')
 
     this.content = ''
     const messages = [
@@ -114,8 +132,12 @@ export class ChatDetailComponent implements OnInit {
       (response) => {
         // const messageId = response.id;
 
-        this.content = ''
-        this.onAnswerReceived(response.choices[0].message.content)
+        this.content = '';
+        this.addItem(response.choices[0].message.content,'answer');
+        console.log(this.items$);
+        console.log(this.route.snapshot.params['id']);
+        
+        // this.onAnswerReceived(response.choices[0].message.content)
         // this.chatService.setMessage(response.choices[0].message.content);
         // console.log(response);
         // console.log(response.choices[0].message.content);
@@ -134,13 +156,13 @@ export class ChatDetailComponent implements OnInit {
   }
 
 
-  addItem(content:string) {
+  addItem(content:string,type:'question'|'answer') {
     const newMessage: Message = 
     {
-      content: content, // 固定内容
-      type: 'question'
+      content: content, 
+      type: type
     }; // 创建新项
-    this.chatDataService.addItem(newMessage); // 调用服务的方法添加新项
+    this.chatDataService.addItem(this.route.snapshot.params['id'],newMessage); // 调用服务的方法添加新项
   }
   // messageContent: string='';
 

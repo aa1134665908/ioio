@@ -57,7 +57,14 @@ export class ChatComponent implements OnInit {
   //   console.log(this.content);
 
   // }
-
+  generateUniqueId(): string {
+    const timestamp = new Date().getTime().toString(16); // 获取当前时间戳并转换为16进制字符串
+    const randomString = Math.random().toString(16).substring(2, 15); // 生成8位随机的16进制字符串
+    console.log(timestamp,randomString);
+    
+    const uniqueId = `${timestamp}${randomString}`; // 拼接时间戳和随机字符串
+    return uniqueId.substring(0, 24); // 截取前16位作为最终的唯一标识符
+  }
 
 
   constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute,private chatDataService:ChatdataService) { }
@@ -66,22 +73,26 @@ export class ChatComponent implements OnInit {
   }
 
 
-  addItem(content:string,type:'question'|'answer') {
+  addItem(id:string,content:string,type:'question'|'answer') {
     const newMessage: Message = 
     {
       content: content, // 固定内容
       type: type
     }; // 创建新项
-    this.chatDataService.addItem(newMessage); // 调用服务的方法添加新项
+    this.chatDataService.addItem(id,newMessage); // 调用服务的方法添加新项
   }
 
   sendMessage() {
+    // this.chatDataService.resetItems() //暂时用不上。清空数据
     const tempContent = this.content;
-    console.log(1111111111111111111111111111111);
+   
     
+    const messageId =this.generateUniqueId();
     // this.chatDataService.setInputData(this.content)
-    this.addItem(tempContent,'question')
-    console.log(2222222222222222222222222222222);
+    this.addItem(messageId,tempContent,'question')
+    
+    this.router.navigate([messageId], { relativeTo: this.route });
+    
     this.content = ''
     const messages = [
       {
@@ -98,10 +109,10 @@ export class ChatComponent implements OnInit {
 
     this.chatService.sendMessage(messages).subscribe(
       (response) => {
-        const messageId = response.id;
-        this.router.navigate([messageId], { relativeTo: this.route });
+        
         this.content=''
-        this.addItem(response.choices[0].message.content,'answer')
+
+        this.addItem(messageId,response.choices[0].message.content,'answer')
         // this.chatService.setMessage(response.choices[0].message.content);
         // console.log(response);
         // console.log(response.choices[0].message.content);
