@@ -56,10 +56,19 @@ export class ChatDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    // console.log('ChatDetailComponent initialized.');
     this.routeSubscription = this.route.params.subscribe(params => {
       const id = params['id'];
-      this.updateComponentForNewId(id);
+      // console.log('Detected Route ID:', id); // 日志输出检测到的路由ID
+      this.chatDataService.setCurrentId(id); // 将ID发送到服务
+      // console.log('Route params:', params);  
+      if (id) {
+        // console.log('Fetching items for id:', id);
+        this.items$ = this.chatDataService.getItemsById(id);
+        // this.items$.subscribe(items => {
+        //   // console.log('Items fetched for id:', id, 'Data:', items);  // 添加此日志以检查数据
+        // });
+      }
     });
 
     this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
@@ -103,6 +112,7 @@ export class ChatDetailComponent implements OnInit {
   // }
 
   ngOnDestroy() {
+    // console.log('ChatDetailComponent destroyed.');  
     this.routeSubscription.unsubscribe(); // 取消订阅，避免内存泄漏
     this.chatComponent.showChatDetail = false;
   }
@@ -134,8 +144,8 @@ export class ChatDetailComponent implements OnInit {
 
         this.content = '';
         this.addItem(response.choices[0].message.content,'answer');
-        console.log(this.items$);
-        console.log(this.route.snapshot.params['id']);
+        // console.log(this.items$);
+        // console.log(this.route.snapshot.params['id']);
         
         // this.onAnswerReceived(response.choices[0].message.content)
         // this.chatService.setMessage(response.choices[0].message.content);

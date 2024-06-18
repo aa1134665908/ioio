@@ -15,18 +15,24 @@
         </div>
         <div class="conversations-box">
             <div class="day">今天</div>
-            <div class="conversation-item" *ngFor="let id of ids$ | async; let i=index" (click)="onItemClick(i,id)"
-                [ngStyle]="{'background': selectedIndex === i ? 'rgba(40,47,55)' : ''}">
+            <div (mouseenter)="onMouseEnter(i)" (mouseleave)="onMouseLeave(i)" class="conversation-item" *ngFor="let id of ids$ | async; let i=index trackBy: trackByFn"
+                (click)="onItemClick(i,id)" [ngStyle]="{'background': selectedIndex === i ? 'rgba(40,47,55)' : ''}">
                 <div style="width: 100%;">
-                    <div class="conversation-title"> {{ ((chatDataService.getItemsById(id) | async) || [])?.[0]?.content || '' }}</div>
+                    <div class="flex" style="display: flex;">
+                        <div class="conversation-title">   {{ ((chatDataService.getItemsById(id) | async) || [])[0].content || '' }}</div>
+                        <div class="conversation-icons" *ngIf="isMouseOverIndex === i"><img src="../../assets/trash.svg" alt="" (click)="deleItem(id)" ></div>
+                    </div>
                     <div class="conversation-content">
-                        {{ ((chatDataService.getItemsById(id) | async) || [])?.slice(-1)?.[0]?.content || '' }}
-
+                        {{ ((chatDataService.getItemsById(id) | async) || []).slice(-1)[0].content || '' }}
                     </div>
                 </div>
             </div>
-
-
+        </div>
+        <div class="bottom-box">
+            <div class="clear-box" (click)="showDeleteConfirm()">
+                <img src="../../assets/trash.png" alt="" style="height: 14px;width: 14px;margin-right: 6px">
+                <div style="padding-top:1px;">清空所有对话数据</div>
+            </div>
         </div>
     </div>
     <div *ngIf="isSideNavCollapsed===false" class="SideNavCollapsed" (click)="toggleSideNav()" nzTooltipTitle="收起侧边栏"
@@ -35,4 +41,5 @@
     <div *ngIf="isSideNavCollapsed===true" class="SideNavCollapsed" (click)="toggleSideNav()" nzTooltipTitle="展开侧边栏"
         nzTooltipPlacement="right" nz-tooltip>
     </div>
-</div>
+ </div>
+ 

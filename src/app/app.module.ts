@@ -22,6 +22,8 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { ChatDetailComponent } from './chat-detail/chat-detail.component';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+
 
 
 
@@ -48,7 +50,9 @@ registerLocaleData(zh);
     NzSegmentedModule,
     NzCheckboxModule,
     NzInputModule,
-    NzMessageModule
+    NzMessageModule,
+    NzModalModule,
+   
   ],
   providers: [
     { provide: NZ_I18N, useValue: zh_CN }

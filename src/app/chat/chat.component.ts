@@ -1,8 +1,10 @@
 import { Component, OnInit, } from '@angular/core';
 import { ChatService } from '../chat.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpEvent, HttpEventType } from '@angular/common/http';
 import { ChatdataService } from '../chatdata.service';
+import { Subscription } from 'rxjs';
+
 
 interface Message {
   content: string;
@@ -17,6 +19,7 @@ interface Message {
 export class ChatComponent implements OnInit {
   content: string = ""
   showChatDetail = false;
+  private routerSub: Subscription = new Subscription();
   isCaptchaVisible: number = 0;
 
   options = ["GPT-3.5", "GPT-4"]
@@ -70,8 +73,31 @@ export class ChatComponent implements OnInit {
   constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute,private chatDataService:ChatdataService) { }
 
   ngOnInit(): void {
+    this.routerSub = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.updateShowChatDetail();
+      }
+    });
+
+    // 初始化时检查当前路径
+    this.updateShowChatDetail();
   }
 
+  private updateShowChatDetail(): void {
+    const childRoute = this.route.snapshot.firstChild;
+    if (childRoute) {
+      // 这里依据你的子路由路径做判断
+      this.showChatDetail = true;
+    } else {
+      this.showChatDetail = false;
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSub) {
+      this.routerSub.unsubscribe();
+    }
+  }
 
   addItem(id:string,content:string,type:'question'|'answer') {
     const newMessage: Message = 
