@@ -1,45 +1,83 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject ,BehaviorSubject} from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+ providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'https://api.deepseek.com/chat/completions';
-  private messageSubject = new BehaviorSubject<string>('');
-  message$ = this.messageSubject.asObservable();
-  
-  constructor(private http: HttpClient) { }
+ private apiUrl = 'https://api.deepseek.com/chat/completions';
+ private messageSubject = new BehaviorSubject<string>('');
+ message$ = this.messageSubject.asObservable();
 
-  sendMessage(messages: any[]): Observable<any> {
-    const data = {
-      "messages": messages,
-      "model": "deepseek-chat",
-     
-      "max_tokens": 2048,
-      
-      "stop": null,
-      "stream": true,
-      
-    };
+ constructor() { }
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
-      'Authorization': 'Bearer sk-e7a82dd7b0a4471b8705fea2608fd60e'
-    });
-    console.log('Sending message:', messages);
-    return this.http.post(this.apiUrl, data, { headers, responseType: 'text' });
-  }
+ sendMessage(messages: any[]): void {
+   const data = {
+     "messages": messages,
+     "model": "deepseek-chat",
+     "max_tokens": 2048,
+     "stop": null,
+     "stream": true,
+   };
 
-  updateMessage(messagePart: string) {
-    console.log('Updating message:', messagePart);
-    this.messageSubject.next(this.messageSubject.getValue() + messagePart);
-  }
+   const headers = new Headers({
+     'Content-Type': 'application/json',
+     'Accept': 'text/event-stream',
+     'Authorization': 'Bearer sk-e7a82dd7b0a4471b8705fea2608fd60e'
+   });
 
-  clearMessage() {
-    console.log('Clearing message');
-    this.messageSubject.next('');
-  }
+   fetch(this.apiUrl, {
+     method: 'POST',
+     headers: headers,
+     body: JSON.stringify(data),
+     credentials: 'include'
+   }).then(response => {
+     if (response.ok && response.body) {
+       const reader = response.body.getReader();
+       const decoder = new TextDecoder('utf-8');
+
+       const readStream = (): void => {
+         reader.read().then(({ done, value }) => {
+           if (done) {
+             return;
+           }
+
+           const chunk = decoder.decode(value, { stream: true });
+           const lines = chunk.split('\n');
+           lines.forEach(line => {
+             if (line.startsWith('data:')) {
+               const data = line.substring(5).trim();
+               if (data !== '[DONE]') {
+                 const chunk = JSON.parse(data);
+                 if (chunk.choices[0].delta.content) {
+                   this.updateMessage(chunk.choices[0].delta.content);
+                 }
+               } else {
+                 reader.cancel();
+               }
+             }
+           });
+
+           readStream();
+         });
+       };
+
+       readStream();
+     } else {
+       console.error('Failed to fetch stream:', response.statusText);
+     }
+   }).catch(error => {
+     console.error('Error fetching stream:', error);
+   });
+ }
+
+ updateMessage(messagePart: string) {
+   console.log('Updating message:', messagePart);
+   this.messageSubject.next(this.messageSubject.getValue() + messagePart);
+ }
+
+ clearMessage() {
+   console.log('Clearing message');
+   this.messageSubject.next('');
+ }
 }
