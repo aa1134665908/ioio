@@ -2,14 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router, } from '@angular/router';
 import { ChatdataService } from '../chatdata.service';
-import { Observable, map, Subscription, combineLatest } from 'rxjs';
+import { Observable, Subscription, combineLatest } from 'rxjs';
 import { NzModalService } from 'ng-zorro-antd/modal';
 
 
-interface Message {
-  content: string;
-  type: 'question' | 'answer';
-}
+
 @Component({
   selector: 'app-user-info',
   templateUrl: './user-info.component.html',
@@ -32,7 +29,7 @@ interface Message {
 export class UserInfoComponent implements OnInit {
   isSideNavCollapsed: boolean = false;
   ids$: Observable<string[]>;
-  isMouse:boolean=false
+  isMouse: boolean = false
   selectedIndex: number | null = null;
   private idSub: Subscription = new Subscription();
   onItemClick(index: number, id: string) {
@@ -42,23 +39,23 @@ export class UserInfoComponent implements OnInit {
 
 
 
-  constructor(private router: Router, public chatDataService: ChatdataService, private cd: ChangeDetectorRef,private modal: NzModalService) {
+  constructor(private router: Router, public chatDataService: ChatdataService, private cd: ChangeDetectorRef, private modal: NzModalService) {
     this.ids$ = this.chatDataService.getIds();
   }
 
 
   isMouseOverIndex: number = -1;
 
-   onMouseEnter(index: number) {
-       this.isMouseOverIndex = index;
-   }
+  onMouseEnter(index: number) {
+    this.isMouseOverIndex = index;
+  }
 
-   onMouseLeave(index: number) {
-       this.isMouseOverIndex = -1;
-   }
-  deleItem(id:string):void{
+  onMouseLeave(index: number) {
+    this.isMouseOverIndex = -1;
+  }
+  deleItem(id: string): void {
     this.chatDataService.removeGroupById(id)
-   
+
   }
 
   showDeleteConfirm(): void {
@@ -78,9 +75,9 @@ export class UserInfoComponent implements OnInit {
   }
 
 
-  resetItems():void{
+  resetItems(): void {
     this.chatDataService.resetItems();
-   
+
   }
 
   trackByFn(index: number, item: any): number {
@@ -103,29 +100,29 @@ export class UserInfoComponent implements OnInit {
         this.selectedIndex = index !== -1 ? index : null;
       }
 
-       // 确保在变更检测前处理可能的 undefined 情况
-   if (this.selectedIndex !== undefined) {
-    console.log('Triggering change detection');
-    this.cd.detectChanges(); // 手动触发变更检测
-    console.log('selectedIndex is undefined, skipping change detection');
-  }
+      // 确保在变更检测前处理可能的 undefined 情况
+      if (this.selectedIndex !== undefined) {
+        console.log('Triggering change detection');
+        this.cd.detectChanges(); // 手动触发变更检测
+        console.log('selectedIndex is undefined, skipping change detection');
+      }
     });
 
-     // 确保数据初始化
- this.chatDataService.getIds().subscribe(ids => {
-  console.log('Initial IDs:', ids);
-});
+    // 确保数据初始化
+    this.chatDataService.getIds().subscribe(ids => {
+      console.log('Initial IDs:', ids);
+    });
 
-this.chatDataService.getCurrentId().subscribe(currentId => {
-  console.log('Initial Current ID:', currentId);
-});
+    this.chatDataService.getCurrentId().subscribe(currentId => {
+      console.log('Initial Current ID:', currentId);
+    });
   }
 
   ngOnDestroy(): void {
     if (this.idSub) {
       this.idSub.unsubscribe();
     }
-   }
+  }
 
   toggleSideNav(): void {
     this.isSideNavCollapsed = !this.isSideNavCollapsed;

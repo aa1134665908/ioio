@@ -37,8 +37,8 @@ export class SideNavComponent implements OnInit {
     }
   }
 
-  createMessage(msg:string):void{
-    this.message.create('error',msg)
+  createMessage(msg: string): void {
+    this.message.create('error', msg)
   }
 
   constructor(private message: NzMessageService) { }

@@ -9,17 +9,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.less']
 })
 export class LoginComponent implements OnInit {
-  username:string=''
-  password:string=''
+  username: string = ''
+  password: string = ''
   isShowingSeeImage = false;
-  placeholderText:string='请输入密码'
+  placeholderText: string = '请输入密码'
   isCaptchaVisible: number = 0;
   checked = true;
 
-  constructor(private router:Router) { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    
+
   }
 
   options = ['密码登录', '验证码登录'];

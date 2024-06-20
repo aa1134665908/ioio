@@ -1,7 +1,6 @@
 import { Component, OnInit, } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { HttpClient, HttpHeaders, HttpEvent, HttpEventType } from '@angular/common/http';
 import { ChatdataService } from '../chatdata.service';
 import { Subscription } from 'rxjs';
 
@@ -12,9 +11,9 @@ interface Message {
 
 
 @Component({
- selector: 'app-chat',
- templateUrl: './chat.component.html',
- styleUrls: ['./chat.component.less']
+  selector: 'app-chat',
+  templateUrl: './chat.component.html',
+  styleUrls: ['./chat.component.less']
 })
 export class ChatComponent implements OnInit {
 
@@ -31,26 +30,26 @@ export class ChatComponent implements OnInit {
 
 
 
- onEnterPress(event: Event, textareaRef: HTMLTextAreaElement) {
-   const keyboardEvent = event as KeyboardEvent;
+  onEnterPress(event: Event, textareaRef: HTMLTextAreaElement) {
+    const keyboardEvent = event as KeyboardEvent;
 
-   if (keyboardEvent.shiftKey) {
-     // 如果按下了 Shift 键,则允许换行
-     return;
-   }
+    if (keyboardEvent.shiftKey) {
+      // 如果按下了 Shift 键,则允许换行
+      return;
+    }
 
-   // 阻止默认的换行行为
-   event.preventDefault();
+    // 阻止默认的换行行为
+    event.preventDefault();
 
 
- this.enterPressCount++;
-   if (this.enterPressCount === 2) {
-     // 执行你想要的函数
-     this.sendMessage();
-     // 重置计数器
-     this.enterPressCount = 0;
-   }
- }
+    this.enterPressCount++;
+    if (this.enterPressCount === 2) {
+      // 执行你想要的函数
+      this.sendMessage();
+      // 重置计数器
+      this.enterPressCount = 0;
+    }
+  }
 
   handleIndexChange(event: any) {
     // console.log(event);
@@ -58,16 +57,11 @@ export class ChatComponent implements OnInit {
   }
 
 
-
-  // onSubmit() {
-  //   console.log(this.content);
-
-  // }
   generateUniqueId(): string {
     const timestamp = new Date().getTime().toString(16); // 获取当前时间戳并转换为16进制字符串
     const randomString = Math.random().toString(16).substring(2, 15); // 生成8位随机的16进制字符串
-    console.log(timestamp,randomString);
-    
+    console.log(timestamp, randomString);
+
     const uniqueId = `${timestamp}${randomString}`; // 拼接时间戳和随机字符串
     return uniqueId.substring(0, 24); // 截取前16位作为最终的唯一标识符
   }
@@ -75,7 +69,7 @@ export class ChatComponent implements OnInit {
 
 
 
-  constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute,private chatDataService:ChatdataService) { }
+  constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute, private chatDataService: ChatdataService) { }
 
   ngOnInit(): void {
     this.routerSub = this.router.events.subscribe(event => {
@@ -104,28 +98,22 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  addItem(id:string,content:string,type:'question'|'answer') {
-    const newMessage: Message = 
+  addItem(id: string, content: string, type: 'question' | 'answer') {
+    const newMessage: Message =
     {
       content: content, // 固定内容
       type: type
     }; // 创建新项
-    this.chatDataService.addItem(id,newMessage); // 调用服务的方法添加新项
+    this.chatDataService.addItem(id, newMessage); // 调用服务的方法添加新项
   }
 
 
 
   sendMessage() {
-    // this.chatDataService.resetItems() //暂时用不上。清空数据
     const tempContent = this.content;
-   
-    
-    const messageId =this.generateUniqueId();
-    // this.chatDataService.setInputData(this.content)
-    this.addItem(messageId,tempContent,'question')
-    
+    const messageId = this.generateUniqueId();
+    this.addItem(messageId, tempContent, 'question')
     this.router.navigate([messageId], { relativeTo: this.route });
-    
     this.content = ''
     const messages = [
       {
@@ -139,6 +127,6 @@ export class ChatComponent implements OnInit {
     ];
     this.showChatDetail = true;
     this.chatService.clearMessage();
-    this.chatService.sendMessage(messages,messageId);
-}
+    this.chatService.sendMessage(messages, messageId);
+  }
 }

@@ -18,7 +18,7 @@ interface GroupedMessages {
 export class ChatdataService {
 
   constructor(private router: Router) {
-    // console.log('ChatdataService initialized with items:', this.itemsSubject.value);  // 添加日志
+
   }
 
   private storageKey = 'chatData';
