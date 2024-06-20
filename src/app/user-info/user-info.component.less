@@ -1,3 +1,35 @@
+::-webkit-scrollbar {
+  height: 1rem;
+  width: 0.5rem;
+}
+
+.conversations[_ngcontent-hff-c205]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, .21);
+}
+
+.conversations[_ngcontent-hff-c205]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .11);
+}
+
+.scrollbar-trigger:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #474B4E;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #2F3438;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
+
 .user-info-container {
   position: relative;
   /* 使子元素可以使用绝对定位 */
@@ -80,8 +112,91 @@
   opacity: 01;
   border-radius: 4px;
   border: 0.5px solid #454d61;
+  cursor: pointer;
 }
 
-.create-chat span{
+.create-chat span {
   color: #fff;
+}
+
+.day {
+  align-items: center;
+  // margin-top: 24px;
+  margin-right: 0;
+  margin-bottom: 8px;
+  margin-left: 0px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9ca4ad;
+
+}
+
+.conversation-item {
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  margin: 0 0 4px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  // border: red 1px solid;
+  cursor: pointer;
+}
+
+.conversation-title {
+  position: relative;
+  width: calc(100% - 12px);
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  color: #ffffff;
+  height: 24px;
+}
+
+.conversation-content {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: #9ca4ad;
+  margin-top: 6px;
+}
+
+.conversations-box {
+  height: calc(100% - 166px);
+  overflow-y: scroll;
+  margin: 0 8px;
+}
+
+.clear-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 32px;
+  padding-right: 12px;
+  cursor: pointer;
+  color: #fff;
+  user-select: none;
+  opacity: .3;
+  font-size: 12px;
+
+}
+
+.clear-box:hover {
+  opacity: 1;
+}
+
+.conversation-icons{
+  color: #fff;
+}
+.conversation-icons img {
+  // color: #fff;
+  filter: brightness(0) invert(1);
+  height: 16px;
+  width: 16px;
+  opacity: .6;
+}
+
+.conversation-icons img:hover{
+  opacity: 1;
 }

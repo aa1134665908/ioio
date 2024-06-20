@@ -1,3 +1,54 @@
-<div>
-  <p>{{ messageContent }}</p>
- </div>
+<div class="chat-box">
+  <div class="chat-title">
+    <div class="model-title">
+      <img
+        [src]="moduleTitle === 'gpt-3.5-turbo（默认）' ? '../../assets/icn_gpt3.5_off.png' : '../../assets/icn_gpt4_turbo_off.png'"
+        alt="">
+      {{moduleTitle}}
+    </div>
+  </div>
+  <div class="main">
+    <div class="message-container">
+      <div class="message-content">
+        <div class="chat-message" *ngFor="let message of items$ |async; trackBy: trackByFn">
+
+          <div *ngIf="message.type === 'question'&& message.content!==''" class="question">
+            <div class="ioio-img"><img src="assets/avatar.png" alt=""></div>
+            <div class="msg-box">
+              <div class="QA-role">YOU</div>
+              <div class="chat-message">
+                <span>{{ message.content }}</span>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="message.type === 'answer' && message.content!==''" class="answer">
+            <div class="ioio-img"><img src="assets/ioio.png" alt=""></div>
+            <div class="msg-box">
+              <div class="QA-role">IOIO</div>
+              <div class="chat-message">
+                <span>{{ message.content }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="chat-input">
+      <textarea nz-input placeholder="输入内容，Shift + Enter 换行" [nzAutosize]="{ minRows: 1, maxRows: 6 }"
+        [nzBorderless]="true" [(ngModel)]="content" #textareaRef
+        (keydown.enter)="onEnterPress($event, textareaRef)"></textarea>
+      <div *ngIf="content===''" class="submit-img submit-img-disabled">
+        <img src="../../assets/arrow.svg">
+      </div>
+      <div *ngIf="content!==''" class="submit-img" (click)="sendMessage()">
+        <img src="../../assets/arrow.svg">
+
+      </div>
+
+    </div>
+
+  </div>
+  <div class="statement">IOIO 基于 AI 技术生成内容的准确性和完整性无法保证，不代表我们的态度和观点。</div>
+</div>

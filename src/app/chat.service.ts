@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ChatdataService } from './chatdata.service'; 
+
 
 @Injectable({
  providedIn: 'root'
@@ -9,9 +12,9 @@ export class ChatService {
  private messageSubject = new BehaviorSubject<string>('');
  message$ = this.messageSubject.asObservable();
 
- constructor() { }
+ constructor(private chatdataService: ChatdataService) { }
 
- sendMessage(messages: any[]): void {
+ sendMessage(messages: any[],id: string): void {
    const data = {
      "messages": messages,
      "model": "deepseek-chat",
@@ -50,7 +53,7 @@ export class ChatService {
                if (data !== '[DONE]') {
                  const chunk = JSON.parse(data);
                  if (chunk.choices[0].delta.content) {
-                   this.updateMessage(chunk.choices[0].delta.content);
+                   this.updateMessage(chunk.choices[0].delta.content,id);
                  }
                } else {
                  reader.cancel();
@@ -71,11 +74,11 @@ export class ChatService {
    });
  }
 
- updateMessage(messagePart: string) {
-   console.log('Updating message:', messagePart);
-   this.messageSubject.next(this.messageSubject.getValue() + messagePart);
- }
-
+ updateMessage(messagePart: string, id: string) {
+  console.log('Updating message:', messagePart);
+  this.messageSubject.next(this.messageSubject.getValue() + messagePart);
+  this.chatdataService.addItem(id, { content: messagePart, type: 'answer' });
+}
  clearMessage() {
    console.log('Clearing message');
    this.messageSubject.next('');
