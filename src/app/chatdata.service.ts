@@ -71,7 +71,7 @@ getItemsById(id: string): Observable<Message[]> {
   getIds(): Observable<string[]> {
     return this.items$.pipe(
       map(groupedMessages => {
-        console.log('getIds:', Object.keys(groupedMessages));
+        // console.log('getIds:', Object.keys(groupedMessages));
         return Object.keys(groupedMessages);
       })
     );
@@ -88,7 +88,7 @@ getItemsById(id: string): Observable<Message[]> {
 
   // 获取当前ID
   getCurrentId(): Observable<string | null> {
-    console.log('getCurrentId:', this.currentIdSubject.value);
+    // console.log('getCurrentId:', this.currentIdSubject.value);
     return this.currentIdSubject.asObservable();
   }
 

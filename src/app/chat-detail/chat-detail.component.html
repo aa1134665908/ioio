@@ -17,7 +17,7 @@
             <div class="msg-box">
               <div class="QA-role">YOU</div>
               <div class="chat-message">
-                <span>{{ message.content }}</span>
+                <markdown [data]="message.content"></markdown>
               </div>
             </div>
           </div>
@@ -26,7 +26,7 @@
             <div class="msg-box">
               <div class="QA-role">IOIO</div>
               <div class="chat-message">
-                <span>{{ message.content }}</span>
+                <markdown [data]="message.content"></markdown>
               </div>
             </div>
           </div>

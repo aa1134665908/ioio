@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 import { ChatdataService } from './chatdata.service';
 
@@ -11,6 +11,9 @@ export class ChatService {
   private apiUrl = 'https://api.deepseek.com/chat/completions';
   private messageSubject = new BehaviorSubject<string>('');
   message$ = this.messageSubject.asObservable();
+    // 新增：用于发出流结束信号
+    private streamCompleteSubject = new Subject<string>();
+    streamComplete$ = this.streamCompleteSubject.asObservable();
 
   constructor(private chatdataService: ChatdataService) { }
 
@@ -42,6 +45,7 @@ export class ChatService {
         const readStream = (): void => {
           reader.read().then(({ done, value }) => {
             if (done) {
+              this.streamCompleteSubject.next(id);
               return;
             }
 
@@ -75,12 +79,12 @@ export class ChatService {
   }
 
   updateMessage(messagePart: string, id: string) {
-    console.log('Updating message:', messagePart);
+    // console.log('Updating message:', messagePart);
     this.messageSubject.next(this.messageSubject.getValue() + messagePart);
     this.chatdataService.addItem(id, { content: messagePart, type: 'answer' });
   }
   clearMessage() {
-    console.log('Clearing message');
+    // console.log('Clearing message');
     this.messageSubject.next('');
   }
 }

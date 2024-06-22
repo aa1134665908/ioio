@@ -32,7 +32,7 @@
 
 .user-info-container {
   position: relative;
-  /* 使子元素可以使用绝对定位 */
+
 }
 
 .user-info {
@@ -40,9 +40,9 @@
   flex-direction: column;
   background-color: #151B1F;
   width: 260px;
-  /* 初始宽度 */
+
   min-width: 260px;
-  /* 初始最小宽度 */
+
   height: 100vh;
   transition: width 1s ease, min-width 1s ease;
   overflow: hidden;
@@ -50,46 +50,44 @@
 
 .user-info.collapsed {
   width: 0;
-  /* 收起时的宽度 */
+
   min-width: 0;
-  /* 收起时的最小宽度 */
+
 
 
 }
 
 .SideNavCollapsed {
-  /* ... */
+
   transition: none;
-  /* 移除原有的过渡效果 */
+
 }
 
 .SideNavCollapsed {
   position: absolute;
-  /* 绝对定位 */
+
   top: 50%;
-  /* 垂直居中 */
+
   transform: translateY(-50%);
-  /* 垂直居中 */
+
   right: -7px;
-  /* 修改后的侧边栏右侧外边距 */
+
   width: 4px;
   height: 24px;
   border-radius: 2px;
   background: #CFD1D4;
   cursor: pointer;
-  /* 鼠标悬停时显示手型 */
+
 
 }
 
 .user-info.collapsed+.SideNavCollapsed {
   right: -7px;
-  /* 收回时保持在可见位置 */
 }
 
 .info-heard {
   display: flex;
   color: #fff;
-  // border: red 1px solid;
   height: 64px;
   width: 244px;
   margin: 0 8px;
@@ -186,9 +184,10 @@
   opacity: 1;
 }
 
-.conversation-icons{
+.conversation-icons {
   color: #fff;
 }
+
 .conversation-icons img {
   // color: #fff;
   filter: brightness(0) invert(1);
@@ -197,6 +196,6 @@
   opacity: .6;
 }
 
-.conversation-icons img:hover{
+.conversation-icons img:hover {
   opacity: 1;
 }

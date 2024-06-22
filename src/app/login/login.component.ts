@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   options = ['密码登录', '验证码登录'];
   handleIndexChange(e: number): void {
-    console.log(e);
+    // console.log(e);
     this.placeholderText = e ? '请输入验证码' : '请输入密码';
     this.isCaptchaVisible = e;
   }
@@ -45,8 +45,8 @@ export class LoginComponent implements OnInit {
       alert('Please fill in all fields');
     } else {
       // 执行登录操作
-      console.log('Username:', this.username);
-      console.log('Password:', this.password);
+      // console.log('Username:', this.username);
+      // console.log('Password:', this.password);
       this.router.navigate(['/chat'])
     }
   }

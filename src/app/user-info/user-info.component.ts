@@ -89,32 +89,32 @@ export class UserInfoComponent implements OnInit {
       this.chatDataService.getCurrentId(),
       this.ids$
     ]).subscribe(([currentId, ids]) => {
-      console.log('Current ID from Service:', currentId);
-      console.log('IDs from Service:', ids);
+      // console.log('Current ID from Service:', currentId);
+      // console.log('IDs from Service:', ids);
       // console.log('Current ID from Service:', currentId); // 日志输出当前ID
       if (currentId === null) {
         this.selectedIndex = null;
       } else {
         const index = ids.indexOf(currentId);
-        console.log('Updated Selected Index:', index); // 日志输出计算的索引
+        // console.log('Updated Selected Index:', index); // 日志输出计算的索引
         this.selectedIndex = index !== -1 ? index : null;
       }
 
       // 确保在变更检测前处理可能的 undefined 情况
       if (this.selectedIndex !== undefined) {
-        console.log('Triggering change detection');
+        // console.log('Triggering change detection');
         this.cd.detectChanges(); // 手动触发变更检测
-        console.log('selectedIndex is undefined, skipping change detection');
+        // console.log('selectedIndex is undefined, skipping change detection');
       }
     });
 
     // 确保数据初始化
     this.chatDataService.getIds().subscribe(ids => {
-      console.log('Initial IDs:', ids);
+      // console.log('Initial IDs:', ids);
     });
 
     this.chatDataService.getCurrentId().subscribe(currentId => {
-      console.log('Initial Current ID:', currentId);
+      // console.log('Initial Current ID:', currentId);
     });
   }
 

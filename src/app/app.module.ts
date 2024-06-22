@@ -23,6 +23,9 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { ChatDetailComponent } from './chat-detail/chat-detail.component';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { MarkdownModule,} from 'ngx-markdown';
+import { markdownConfig } from './markdown.config';
+import { CodeBlockHeaderPipe  } from './code-block.pipe';
 
 
 
@@ -38,7 +41,8 @@ registerLocaleData(zh);
     SideNavComponent,
     UserInfoComponent,
     ChatComponent,
-    ChatDetailComponent
+    ChatDetailComponent,
+    CodeBlockHeaderPipe
   ],
   imports: [
     BrowserModule,
@@ -52,7 +56,7 @@ registerLocaleData(zh);
     NzInputModule,
     NzMessageModule,
     NzModalModule,
-   
+    MarkdownModule.forRoot(markdownConfig),
   ],
   providers: [
     { provide: NZ_I18N, useValue: zh_CN }

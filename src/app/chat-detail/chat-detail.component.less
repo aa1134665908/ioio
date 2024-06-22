@@ -59,7 +59,7 @@
 .chat-message {
   margin-bottom: 10px;
   min-height: 20px;
-  white-space: pre-wrap;
+  // white-space: pre-wrap;
   max-width: 768px;
 
 }
@@ -169,4 +169,125 @@ textarea {
 .submit-img-disabled {
   opacity: .1;
   cursor: default;
+}
+
+
+// ::ng-deep .markdown {
+//   unicode-bidi: isolate;
+//     font-variant-numeric: tabular-nums;
+//     text-transform: none;
+//     text-indent: 0px !important;
+//     text-align: start !important;
+//     text-align-last: start !important;
+//   /* 自定义Markdown渲染后的样式 */
+// }
+
+// ::ng-deep pre {
+//   margin-top: 0;
+//   padding: 16px;
+//   background: #000;
+// }
+
+::ng-deep code {
+    color: #000;
+    background: #ebf0f2;
+    font-family: Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;
+    font-size: 16px;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    tab-size: 4;
+    
+    hyphens: none;
+
+    
+}
+
+:host ::ng-deep {
+  pre[class*="language-"] {
+    margin-bottom: 8px; // 或者你想要的其他 margin 值
+  }
+}
+
+
+.code-block-wrapper {
+  margin: 1em 0;
+}
+
+.language-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #343542;
+  padding: 5px 10px;
+  // border: 1px solid #e1e4e8;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  margin-top: 8px;
+  
+}
+
+.language-name {
+  font-size: 12px;
+  // font-weight: 600;
+  color: #24292e;
+  color: #fff;
+}
+
+:host ::ng-deep .copy-button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+ 
+}
+
+.copy-button:hover {
+  background-color: #22222c ;// 轻微的背景色变化
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); //
+  
+}
+
+:host ::ng-deep .code-block-wrapper pre {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+:host ::ng-deep {
+  ol {
+    padding-left: 1rem;
+  }
+}
+
+:host ::ng-deep {
+  .code-block-wrapper pre {
+    &::-webkit-scrollbar {
+      height: 0.5rem;
+      width: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+      border-radius: 9999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #c9ccd0b3;
+    border-radius: 9999px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,.4);
+    }
+
+    // scrollbar-width: thin;
+    // scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+  
 }

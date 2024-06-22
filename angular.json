@@ -42,13 +42,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "5kb",
+                  "maximumError": "6kb"
                 }
               ],
               "fileReplacements": [
@@ -101,9 +101,33 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.less"
+              "src/styles.less",
+              "node_modules/prismjs/themes/prism-okaidia.css"
+              
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/prismjs/prism.js",
+              "node_modules/prismjs/components/prism-typescript.min.js",
+              "node_modules/prismjs/components/prism-javascript.min.js",
+              "node_modules/prismjs/components/prism-python.min.js",
+              "node_modules/prismjs/components/prism-java.min.js",
+              "node_modules/prismjs/components/prism-c.min.js",
+              "node_modules/prismjs/components/prism-cpp.min.js",
+              "node_modules/prismjs/components/prism-csharp.min.js",
+              "node_modules/prismjs/components/prism-ruby.min.js",
+              "node_modules/prismjs/components/prism-go.min.js",
+              "node_modules/prismjs/components/prism-rust.min.js",
+              "node_modules/prismjs/components/prism-swift.min.js",
+              "node_modules/prismjs/components/prism-sql.min.js",
+              "node_modules/prismjs/components/prism-bash.min.js",
+              "node_modules/prismjs/components/prism-markdown.min.js",
+              "node_modules/prismjs/components/prism-json.min.js",
+              "node_modules/prismjs/components/prism-yaml.min.js",
+              "node_modules/prismjs/components/prism-css.min.js",
+              "node_modules/prismjs/components/prism-sass.min.js",
+              "node_modules/prismjs/components/prism-less.min.js"
+              
+            ]
           }
         }
       }

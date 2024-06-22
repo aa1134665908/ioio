@@ -60,7 +60,7 @@ export class ChatComponent implements OnInit {
   generateUniqueId(): string {
     const timestamp = new Date().getTime().toString(16); // 获取当前时间戳并转换为16进制字符串
     const randomString = Math.random().toString(16).substring(2, 15); // 生成8位随机的16进制字符串
-    console.log(timestamp, randomString);
+    // console.log(timestamp, randomString);
 
     const uniqueId = `${timestamp}${randomString}`; // 拼接时间戳和随机字符串
     return uniqueId.substring(0, 24); // 截取前16位作为最终的唯一标识符
