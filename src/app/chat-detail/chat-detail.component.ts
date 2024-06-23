@@ -3,13 +3,14 @@ import { ChatComponent } from '../chat/chat.component';
 import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../chat.service';
 import { ChatdataService } from '../chatdata.service';
-import { Observable, map, Subscription, of } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
 import { MarkdownService } from 'ngx-markdown';
+import { Message } from "../chat-message.interface"
 
-interface Message {
-  content: string;
-  type: 'question' | 'answer';
-}
+// interface Message {
+//   content: string;
+//   type: 'question' | 'answer';
+// }
 
 declare var Prism: any;
 
@@ -29,7 +30,7 @@ export class ChatDetailComponent implements OnInit {
   items$: Observable<Message[]> = of([]);
   copyFeedbackButton: HTMLButtonElement | null = null;
   private streamCompleteSubscription: Subscription | undefined;
-
+  sendStatus:boolean=false
 
   ngOnInit(): void {
     this.routeSubscription = this.route.params.subscribe(params => {
@@ -46,6 +47,8 @@ export class ChatDetailComponent implements OnInit {
       (completedId: string) => {
         if (completedId === this.route.snapshot.params['id']) {
           setTimeout(() => this.wrapCodeBlocks(), 0);
+          this.sendStatus=false
+          
         }
       }
     );
@@ -81,40 +84,52 @@ export class ChatDetailComponent implements OnInit {
     this.ngZone.run(() => {
       console.log('Starting wrapCodeBlocks');
       
-      const preElements = this.el.nativeElement.querySelectorAll('pre');
+      const preElements = this.el.nativeElement.querySelectorAll('pre:not(.wrapped)');
       preElements.forEach((pre: HTMLElement) => {
         const code = pre.querySelector('code');
         if (code) {
+          // 标记这个 pre 元素为已处理
+          this.renderer.addClass(pre, 'wrapped');
+          
           const language = this.getLanguage(code);
           const wrapper = this.renderer.createElement('div');
           this.renderer.addClass(wrapper, 'code-block-wrapper');
-
+  
           const header = this.renderer.createElement('div');
           this.renderer.addClass(header, 'language-header');
-
+  
           const languageSpan = this.renderer.createElement('span');
           this.renderer.addClass(languageSpan, 'language-name');
           this.renderer.setProperty(languageSpan, 'textContent', language);
-
+  
           const copyButton = this.renderer.createElement('button') as HTMLButtonElement;
           this.renderer.addClass(copyButton, 'copy-button');
           this.renderer.setProperty(copyButton, 'textContent', 'Copy code');
           this.renderer.listen(copyButton, 'click', () => this.copyCode(code, copyButton));
-
+  
           this.renderer.appendChild(header, languageSpan);
           this.renderer.appendChild(header, copyButton);
-
-          this.renderer.insertBefore(pre.parentNode, wrapper, pre);
-          this.renderer.appendChild(wrapper, header);
-          this.renderer.appendChild(wrapper, pre);
+          if (pre.parentNode && pre.parentNode instanceof Element && !pre.parentNode.classList.contains('code-block-wrapper')) {
+            this.renderer.insertBefore(pre.parentNode, wrapper, pre);
+            this.renderer.appendChild(wrapper, header);
+            this.renderer.appendChild(wrapper, pre);
+          } else if (!pre.parentNode) {
+            console.warn('Pre element has no parent node:', pre);
+            // 可以在这里添加一些错误处理逻辑
+          } else {
+            console.warn('Pre element parent is not an Element or already wrapped:', pre);
+            // 可以在这里添加一些额外的处理逻辑
+          }
+          
         }
       });
-
+  
       setTimeout(() => this.scrollToBottom(), 0);
       this.cdr.detectChanges();
       console.log('Finished wrapCodeBlocks');
     });
   }
+  
 
   private getLanguage(codeElement: HTMLElement): string {
     const classes = codeElement.className.split(' ');
@@ -212,29 +227,38 @@ export class ChatDetailComponent implements OnInit {
     if (this.observer) {
       this.observer.disconnect();
     }
+
+    if (this.streamCompleteSubscription) {
+      this.streamCompleteSubscription.unsubscribe();
+    }
   }
 
+  cancelRequest() {
+    this.chatService.cancelOngoingRequest();
+    this.sendStatus=false
+  }
 
 
 
   sendMessage() {
     const tempContent = this.content;
-    this.addItem(tempContent, 'question')
+    this.addItem(tempContent, 'user')
     this.content = ''
-    const messages = [
-      {
-        "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
-        "role": "system"
-      },
-      {
-        "content": tempContent,
-        "role": "user"
-      }
-    ];
+    this.sendStatus=true
+    // const messages = [
+    //   {
+    //     "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
+    //     "role": "system"
+    //   },
+    //   {
+    //     "content": tempContent,
+    //     "role": "user"
+    //   }
+    // ];
 
 
     this.chatService.clearMessage();
-    this.chatService.sendMessage(messages, this.route.snapshot.params['id']);
+    this.chatService.sendMessage(this.route.snapshot.params['id']);
    
   
   }
@@ -244,11 +268,11 @@ export class ChatDetailComponent implements OnInit {
   }
 
 
-  addItem(content: string, type: 'question' | 'answer') {
+  addItem(content: string, role: 'user' | 'assistant') {
     const newMessage: Message =
     {
       content: content,
-      type: type
+      role: role
     }; // 创建新项
     this.chatDataService.addItem(this.route.snapshot.params['id'], newMessage); // 调用服务的方法添加新项
   }

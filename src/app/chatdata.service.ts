@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { Message } from "./chat-message.interface"
 
-interface Message {
-  content: string;
-  type: 'question' | 'answer';
-}
+// interface Message {
+//   content: string;
+//   type: 'question' | 'answer';
+// }
 
 interface GroupedMessages {
   [id: string]: Message[];
@@ -27,31 +28,31 @@ export class ChatdataService {
   items$ = this.itemsSubject.asObservable();
 
   addItem(id: string, item: Message) {
-    const currentItems = this.itemsSubject.value;
-    
-    if (currentItems[id]) {
-      // If the ID already exists
-      if (item.type === 'answer') {
-        const lastMessage = currentItems[id][currentItems[id].length - 1];
-        if (lastMessage.type === 'answer') {
-          // If the last message is also an 'answer', append the content
-          lastMessage.content += item.content;
-        } else {
-          // If the last message is not an 'answer', create a new 'answer' message
-          currentItems[id].push(item);
-        }
+  const currentItems = this.itemsSubject.value;
+  
+  if (currentItems[id]) {
+    // If the ID already exists
+    if (item.role === 'assistant') {
+      const lastMessage = currentItems[id][currentItems[id].length - 1];
+      if (lastMessage.role === 'assistant') {
+        // If the last message is also an 'assistant', append the content
+        lastMessage.content += item.content;
       } else {
-        // If the message type is 'question', create a new entry
+        // If the last message is not an 'assistant', create a new 'assistant' message
         currentItems[id].push(item);
       }
     } else {
-      // If the ID doesn't exist, create a new entry
-      currentItems[id] = [item];
+      // If the message role is 'user', create a new entry
+      currentItems[id].push(item);
     }
-  
-    this.itemsSubject.next(currentItems);
-    this.saveToLocalStorage(currentItems);
+  } else {
+    // If the ID doesn't exist, create a new entry
+    currentItems[id] = [item];
   }
+
+  this.itemsSubject.next(currentItems);
+  this.saveToLocalStorage(currentItems);
+}
   
 
 resetItems(): void {
@@ -63,10 +64,12 @@ getItemsById(id: string): Observable<Message[]> {
   return this.items$.pipe(
     map(groupedItems => {
       const items = groupedItems[id] || [];
-      return items.length > 0 ? items : [{ content: '', type: 'answer' }];
+      return items.length > 0 ? items : [{ content: '', role: 'assistant' }];
     })
   );
  }
+
+
 
   getIds(): Observable<string[]> {
     return this.items$.pipe(

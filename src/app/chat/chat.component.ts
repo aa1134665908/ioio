@@ -3,11 +3,12 @@ import { ChatService } from '../chat.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { ChatdataService } from '../chatdata.service';
 import { Subscription } from 'rxjs';
+import { Message } from "../chat-message.interface"
 
-interface Message {
-  content: string;
-  type: 'question' | 'answer';
-}
+// interface Message {
+//   content: string;
+//   type: 'question' | 'answer';
+// }
 
 
 @Component({
@@ -98,11 +99,11 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  addItem(id: string, content: string, type: 'question' | 'answer') {
+  addItem(id: string, content: string, role: 'user' | 'assistant') {
     const newMessage: Message =
     {
       content: content, // 固定内容
-      type: type
+      role: role
     }; // 创建新项
     this.chatDataService.addItem(id, newMessage); // 调用服务的方法添加新项
   }
@@ -112,21 +113,21 @@ export class ChatComponent implements OnInit {
   sendMessage() {
     const tempContent = this.content;
     const messageId = this.generateUniqueId();
-    this.addItem(messageId, tempContent, 'question')
+    this.addItem(messageId, tempContent, 'user')
     this.router.navigate([messageId], { relativeTo: this.route });
     this.content = ''
-    const messages = [
-      {
-        "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
-        "role": "system"
-      },
-      {
-        "content": tempContent,
-        "role": "user"
-      }
-    ];
+    // const messages = [
+    //   {
+    //     "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
+    //     "role": "system"
+    //   },
+    //   {
+    //     "content": tempContent,
+    //     "role": "user"
+    //   }
+    // ];
     this.showChatDetail = true;
     this.chatService.clearMessage();
-    this.chatService.sendMessage(messages, messageId);
+    this.chatService.sendMessage( messageId);
   }
 }
