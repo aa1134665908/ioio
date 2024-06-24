@@ -4,13 +4,11 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../chat.service';
 import { ChatdataService } from '../chatdata.service';
 import { Observable, Subscription, of } from 'rxjs';
-import { MarkdownService } from 'ngx-markdown';
+import { MarkdownService,  } from 'ngx-markdown';
 import { Message } from "../chat-message.interface"
+import { KatexService } from '../katex.service';
+import { marked } from 'marked';
 
-// interface Message {
-//   content: string;
-//   type: 'question' | 'answer';
-// }
 
 declare var Prism: any;
 
@@ -33,6 +31,7 @@ export class ChatDetailComponent implements OnInit {
   sendStatus:boolean=false
 
   ngOnInit(): void {
+    
     this.routeSubscription = this.route.params.subscribe(params => {
       const id = params['id'];
       this.chatDataService.setCurrentId(id); // 将ID发送到服务
@@ -47,6 +46,8 @@ export class ChatDetailComponent implements OnInit {
       (completedId: string) => {
         if (completedId === this.route.snapshot.params['id']) {
           setTimeout(() => this.wrapCodeBlocks(), 0);
+          setTimeout(() => this.setupMarkdownKatex(), 0);
+          
           this.sendStatus=false
           
         }
@@ -55,7 +56,7 @@ export class ChatDetailComponent implements OnInit {
     
     this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
     setTimeout(() => this.scrollToBottom(), 0);
-  
+    setTimeout(() => this.setupMarkdownKatex(), 0);
   }
 
   constructor(
@@ -67,7 +68,8 @@ export class ChatDetailComponent implements OnInit {
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private katexService: KatexService
   ) { }
 
 
@@ -82,7 +84,7 @@ export class ChatDetailComponent implements OnInit {
 
   private wrapCodeBlocks() {
     this.ngZone.run(() => {
-      console.log('Starting wrapCodeBlocks');
+      // console.log('Starting wrapCodeBlocks');
       
       const preElements = this.el.nativeElement.querySelectorAll('pre:not(.wrapped)');
       preElements.forEach((pre: HTMLElement) => {
@@ -126,10 +128,59 @@ export class ChatDetailComponent implements OnInit {
   
       setTimeout(() => this.scrollToBottom(), 0);
       this.cdr.detectChanges();
-      console.log('Finished wrapCodeBlocks');
+      // console.log('Finished wrapCodeBlocks');
     });
   }
   
+  private setupMarkdownKatex() {
+    // console.log('Setting up Markdown and KaTeX');
+    const renderer = new marked.Renderer();
+    
+    const originalParagraph = renderer.paragraph.bind(renderer);
+    const originalText = renderer.text.bind(renderer);
+
+    renderer.paragraph = (text: string) => {
+      // console.log('Original paragraph:', text);
+      const processedText = this.processKatex(text);
+      // console.log('Processed paragraph:', processedText);
+      return originalParagraph(processedText);
+    };
+
+    renderer.text = (text: string) => {
+      // console.log('Original text:', text);
+      const processedText = this.processKatex(text);
+      // console.log('Processed text:', processedText);
+      return originalText(processedText);
+    };
+
+    this.markdownService.renderer = renderer;
+  }
+
+  private processKatex(text: string): string {
+    // console.log('Processing KaTeX for:', text);
+
+    // 处理块级数学公式
+    text = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+      // console.log('Found block formula:', formula);
+      const rendered = this.katexService.renderExpression(formula.trim(), true);
+      // console.log('Rendered block formula:', rendered);
+      return rendered;
+    });
+
+    // 处理行内数学公式
+    text = text.replace(/\$(.+?)\$/g, (match, formula) => {
+      // console.log('Found inline formula:', formula);
+      const rendered = this.katexService.renderExpression(formula.trim(), false);
+      // console.log('Rendered inline formula:', rendered);
+      return rendered;
+    });
+
+    // console.log('After KaTeX processing:', text);
+    return text;
+  }
+
+
+
 
   private getLanguage(codeElement: HTMLElement): string {
     const classes = codeElement.className.split(' ');
@@ -168,15 +219,15 @@ export class ChatDetailComponent implements OnInit {
   }
 
 
-  processMarkdown(content: string): string {
-    const parsed = this.markdownService.parse(content);
-    setTimeout(() => {
-      if (typeof Prism !== 'undefined' && Prism.highlightAll) {
-        Prism.highlightAll();
-      }
-    }, 0);
-    return parsed;
-  }
+  // processMarkdown(content: string): string {
+  //   const parsed = this.markdownService.parse(content);
+  //   setTimeout(() => {
+  //     if (typeof Prism !== 'undefined' && Prism.highlightAll) {
+  //       Prism.highlightAll();
+  //     }
+  //   }, 0);
+  //   return parsed;
+  // }
 
 
   private scrollToBottom(): void {

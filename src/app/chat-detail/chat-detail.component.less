@@ -1,3 +1,9 @@
+@import '~katex/dist/katex.css';
+
+:host ::ng-deep {
+  .katex { font-size: 1em !important; }
+  .katex-display { margin: 1em 0; }
+}
 ::-webkit-scrollbar {
   height: 1rem;
   width: 0.5rem;
@@ -37,7 +43,7 @@
 }
 
 .main {
-  width: 100%;
+  width: calc(100% - 8px);
   flex: 1;
   overflow-y: auto;
 }
@@ -61,6 +67,7 @@
   min-height: 20px;
   // white-space: pre-wrap;
   max-width: 768px;
+  font-size: 16px;
 
 }
 
