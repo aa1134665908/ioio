@@ -69,7 +69,16 @@ getItemsById(id: string): Observable<Message[]> {
   );
  }
 
-
+ deleteMessage(id: string, index: number) {
+  const currentItems = this.itemsSubject.value; // 获取所有消息组
+  if (currentItems[id]) { // 检查对应的组是否存在
+    if (index >= 0 && index < currentItems[id].length) { // 检查索引是否有效
+      currentItems[id].splice(index, 1); // 删除组中的特定消息
+      this.itemsSubject.next({ ...currentItems }); // 更新消息组
+      this.saveToLocalStorage(currentItems); // 同步更新本地存储
+    }
+  }
+}
 
   getIds(): Observable<string[]> {
     return this.items$.pipe(

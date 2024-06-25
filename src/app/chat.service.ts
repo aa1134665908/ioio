@@ -33,7 +33,7 @@ export class ChatService {
       take(1),
       map(messages => {
         const systemMessage: Message = {
-          content: "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
+          content: "你是ChatGPT，这是一个由OpenAI训练的基于gpt-4o（omni）架构的大型语言模型。知识截止时间：2023-10",
           role: "system"
         };
         return this.trimMessages([systemMessage, ...messages]);
@@ -122,7 +122,7 @@ export class ChatService {
     
     // 确保系统消息在第一位
     const systemMessage = messages.find(m => m.role === 'system') || {
-      content: "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture. Knowledge cutoff: 2023-10",
+      content: "你是ChatGPT，这是一个由OpenAI训练的基于gpt-4o（omni）架构的大型语言模型。知识截止时间：2023-10",
       role: "system"
     };
     

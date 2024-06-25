@@ -1,17 +1,13 @@
-import {  ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, Renderer2 } from '@angular/core';
 import { ChatComponent } from '../chat/chat.component';
 import { ActivatedRoute } from '@angular/router';
 import { ChatService } from '../chat.service';
 import { ChatdataService } from '../chatdata.service';
-import { Observable, Subscription, of } from 'rxjs';
-import { MarkdownService,  } from 'ngx-markdown';
+import { Observable, Subject, Subscription, of, takeUntil } from 'rxjs';
+import { MarkdownService } from 'ngx-markdown';
 import { Message } from "../chat-message.interface"
 import { KatexService } from '../katex.service';
 import { marked } from 'marked';
-
-
-declare var Prism: any;
-
 
 @Component({
 
@@ -28,32 +24,33 @@ export class ChatDetailComponent implements OnInit {
   items$: Observable<Message[]> = of([]);
   copyFeedbackButton: HTMLButtonElement | null = null;
   private streamCompleteSubscription: Subscription | undefined;
-  sendStatus:boolean=false
+  isSending: boolean = false
+  private ngUnsubscribe = new Subject<void>();
 
   ngOnInit(): void {
-    
-    this.routeSubscription = this.route.params.subscribe(params => {
+
+    this.routeSubscription = this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       const id = params['id'];
       this.chatDataService.setCurrentId(id); // 将ID发送到服务
       if (id) {
-        
+
         this.items$ = this.chatDataService.getItemsById(id);
         this.cdr.detectChanges(); // 触发变更检测
-        setTimeout(() => this.wrapCodeBlocks(), 0); 
+        setTimeout(() => this.wrapCodeBlocks(), 0);
       }
     });
-    this.streamCompleteSubscription = this.chatService.streamComplete$.subscribe(
+    this.streamCompleteSubscription = this.chatService.streamComplete$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       (completedId: string) => {
         if (completedId === this.route.snapshot.params['id']) {
           setTimeout(() => this.wrapCodeBlocks(), 0);
           setTimeout(() => this.setupMarkdownKatex(), 0);
-          
-          this.sendStatus=false
-          
+
+          this.isSending = false
+
         }
       }
     );
-    
+
     this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
     setTimeout(() => this.scrollToBottom(), 0);
     setTimeout(() => this.setupMarkdownKatex(), 0);
@@ -85,30 +82,30 @@ export class ChatDetailComponent implements OnInit {
   private wrapCodeBlocks() {
     this.ngZone.run(() => {
       // console.log('Starting wrapCodeBlocks');
-      
+
       const preElements = this.el.nativeElement.querySelectorAll('pre:not(.wrapped)');
       preElements.forEach((pre: HTMLElement) => {
         const code = pre.querySelector('code');
         if (code) {
           // 标记这个 pre 元素为已处理
           this.renderer.addClass(pre, 'wrapped');
-          
+
           const language = this.getLanguage(code);
           const wrapper = this.renderer.createElement('div');
           this.renderer.addClass(wrapper, 'code-block-wrapper');
-  
+
           const header = this.renderer.createElement('div');
           this.renderer.addClass(header, 'language-header');
-  
+
           const languageSpan = this.renderer.createElement('span');
           this.renderer.addClass(languageSpan, 'language-name');
           this.renderer.setProperty(languageSpan, 'textContent', language);
-  
+
           const copyButton = this.renderer.createElement('button') as HTMLButtonElement;
           this.renderer.addClass(copyButton, 'copy-button');
           this.renderer.setProperty(copyButton, 'textContent', 'Copy code');
           this.renderer.listen(copyButton, 'click', () => this.copyCode(code, copyButton));
-  
+
           this.renderer.appendChild(header, languageSpan);
           this.renderer.appendChild(header, copyButton);
           if (pre.parentNode && pre.parentNode instanceof Element && !pre.parentNode.classList.contains('code-block-wrapper')) {
@@ -122,20 +119,20 @@ export class ChatDetailComponent implements OnInit {
             console.warn('Pre element parent is not an Element or already wrapped:', pre);
             // 可以在这里添加一些额外的处理逻辑
           }
-          
+
         }
       });
-  
+
       setTimeout(() => this.scrollToBottom(), 0);
       this.cdr.detectChanges();
       // console.log('Finished wrapCodeBlocks');
     });
   }
-  
+
   private setupMarkdownKatex() {
     // console.log('Setting up Markdown and KaTeX');
     const renderer = new marked.Renderer();
-    
+
     const originalParagraph = renderer.paragraph.bind(renderer);
     const originalText = renderer.text.bind(renderer);
 
@@ -219,33 +216,19 @@ export class ChatDetailComponent implements OnInit {
   }
 
 
-  // processMarkdown(content: string): string {
-  //   const parsed = this.markdownService.parse(content);
-  //   setTimeout(() => {
-  //     if (typeof Prism !== 'undefined' && Prism.highlightAll) {
-  //       Prism.highlightAll();
-  //     }
-  //   }, 0);
-  //   return parsed;
-  // }
 
+  deleteMessage(index: number) {
+    const currentId = this.route.snapshot.params['id'];
+    this.chatDataService.deleteMessage(currentId, index);
+  }
 
   private scrollToBottom(): void {
     try {
       const chatBox = this.el.nativeElement.querySelector('.main');
       chatBox.scrollTop = chatBox.scrollHeight;
-    } catch(err) { }
+    } catch (err) { }
   }
-  
 
-  // private updateComponentForNewId(id: string) {
-  //   // 更新组件数据
-  //   this.items$ = this.chatDataService.items$.pipe(
-  //     map(groupedMessages => {
-  //       return groupedMessages[id] || [];
-  //     })
-  //   );
-  // }
 
 
 
@@ -272,21 +255,34 @@ export class ChatDetailComponent implements OnInit {
 
 
   ngOnDestroy() {
-    // console.log('ChatDetailComponent destroyed.');  
-    this.routeSubscription.unsubscribe(); // 取消订阅，避免内存泄漏
-    this.chatComponent.showChatDetail = false;
+ 
+    console.log('ChatDetailComponent destroyed.');
+    
+    // 发出信号以取消所有使用 takeUntil 的订阅
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+
+    // 取消特定的订阅（如果还需要的话）
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+    if (this.streamCompleteSubscription) {
+      this.streamCompleteSubscription.unsubscribe();
+    }
+
+    // 断开 MutationObserver 连接
     if (this.observer) {
       this.observer.disconnect();
     }
 
-    if (this.streamCompleteSubscription) {
-      this.streamCompleteSubscription.unsubscribe();
-    }
+    // 重置组件状态
+    this.chatComponent.showChatDetail = false;
+  
   }
 
   cancelRequest() {
     this.chatService.cancelOngoingRequest();
-    this.sendStatus=false
+    this.isSending = false
   }
 
 
@@ -295,27 +291,18 @@ export class ChatDetailComponent implements OnInit {
     const tempContent = this.content;
     this.addItem(tempContent, 'user')
     this.content = ''
-    this.sendStatus=true
-    // const messages = [
-    //   {
-    //     "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
-    //     "role": "system"
-    //   },
-    //   {
-    //     "content": tempContent,
-    //     "role": "user"
-    //   }
-    // ];
+    this.isSending = true
+
 
 
     this.chatService.clearMessage();
     this.chatService.sendMessage(this.route.snapshot.params['id']);
-   
-  
+
+
   }
 
-  trackByFn(index: number, item: any): number {
-    return item.id; // 返回项的唯一标识符
+  trackByFn(index: number, item: Message): number {
+    return index;
   }
 
 
