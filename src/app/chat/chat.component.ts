@@ -5,11 +5,18 @@ import { ChatdataService } from '../chatdata.service';
 import { Subscription } from 'rxjs';
 import { Message } from "../chat-message.interface"
 
-// interface Message {
-//   content: string;
-//   type: 'question' | 'answer';
-// }
+interface SubModel {
+  name: string;
+}
 
+interface ModelGroup {
+  name: string;
+  imageUrl: string;
+  subModels: SubModel[];
+  title?: string;
+  content?: string;
+  selectedSubModelIndex?: number | null; 
+}
 
 @Component({
   selector: 'app-chat',
@@ -18,17 +25,130 @@ import { Message } from "../chat-message.interface"
 })
 export class ChatComponent implements OnInit {
 
+  modelGroup: ModelGroup[] = [
+    {
+      name: "ChatGPT",
+      imageUrl: "../../assets/icn_gpt3.5_off.png",
+      title: '当前地球上公布的 最聪明的 AI 模型 ',
+      content:'ChatGPT 是基于 OpenAI 的 GPT 系列模型开发的对话系统，能够理解和生成自然语言文本，广泛应用于聊天、问答、内容创作等场景，帮助用户解决各种问题并提供信息支持。',
+      subModels: [
+        { name: "GPT-3.5(默认)", },
+        { name: "GPT-4Turbo", },
+        { name: "GPT-4o", }
+      ],
+      selectedSubModelIndex: 0
+    },
+    {
+      name: "Other",
+      title:'其他不同能力的模型',
+      imageUrl: "../../assets/icn_gpt4_turbo_off.png",
+      content:'更多实验性的模型，感受不一样的效果，注意此模式为探索性质，稳定性较弱',
+      subModels: [
+        { name: "deepseek-chat", },
+        { name: "deepseek-coder", }
+      ],
+      selectedSubModelIndex: null
+    },
+    // 你可以在这里添加更多主要模型
+  ];
+  hoveredIndex: number | null = null;
+  isMouseSelect:boolean=false
+  isInitialLoad: boolean = false;
+  hideDetailsTimeout: any;
   content: string = ""
   showChatDetail = false;
   private routerSub: Subscription = new Subscription();
   isCaptchaVisible: number = 0;
 
-  options = ["GPT-3.5", "GPT-4"]
+  titleOptions = ["ChatGPT", "Alpha"]
 
 
   private enterPressCount = 0;
+  selectedModelIndex: number=0;
 
+  selectModel(groupIndex: number, subModelIndex: number): void {
+    this.modelGroup.forEach((group, index) => {
+      if (index !== groupIndex) {
+        group.selectedSubModelIndex = null;
+      }
+    });
+    // 设置当前选择的子模型
+    this.modelGroup[groupIndex].selectedSubModelIndex = subModelIndex;
+    
+    this.sendSelectedSubModelName(groupIndex,subModelIndex)
+  }
 
+  modelGroupSelect(index: number): void {
+    this.isCaptchaVisible = index;
+    this.isInitialLoad = true;
+  }
+
+  getImageStyle(index: number): { filter?: string } {
+    if (this.isCaptchaVisible === index || this.hoveredIndex === index) {
+      if (index === 0) {
+        return {
+          filter: 'brightness(0) saturate(100%) invert(71%) sepia(17%) saturate(1354%) hue-rotate(137deg) brightness(89%) contrast(90%)'
+        };
+      } else if (index === 1) {
+        return {
+          filter: 'brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1854%) hue-rotate(247deg) brightness(115%) contrast(88%)'
+        };
+      }
+    }
+    return {}; // 不应用滤镜
+  }
+
+  getTextStyle(index: number): { color?: string } {
+    if (this.isCaptchaVisible === index || this.hoveredIndex === index) {
+      return { color: 'black' };
+    }
+    return {}; // 默认颜色
+  }
+
+  onMouseEnter(index: number): void {
+    this.modelGroupSelect(index)
+    this.hoveredIndex = index;
+    this.isMouseSelect = true;
+    this.clearHideDetailsTimeout();
+  }
+
+  scheduleHideDetails(): void {
+    this.hideDetailsTimeout = setTimeout(() => {
+      this.hoveredIndex = null;
+      // this.isCaptchaVisible = -1;
+      this.isInitialLoad =false
+    }, 300); // 延迟300毫秒
+  }
+
+  clearHideDetailsTimeout(): void {
+    if (this.hideDetailsTimeout) {
+      clearTimeout(this.hideDetailsTimeout);
+      this.hideDetailsTimeout = null;
+    }
+  }
+
+  sendSelectedSubModelName(groupIndex: number,selectedModelIndex:number) {
+    // 获取当前选择的模型
+    const selectedModel = this.modelGroup[groupIndex];
+  
+    // 检查 selectedSubModelIndex 是否有效
+    if (typeof selectedModel.selectedSubModelIndex === 'number' ) {
+      // 获取当前选择的子模型
+      const selectedSubModel = selectedModel.subModels[selectedModel.selectedSubModelIndex];
+  
+      // 获取当前选择的子模型的名称
+      const selectedSubModelName = selectedSubModel.name;
+  
+      // 调用服务函数，并传递当前选择的子模型名称
+      this.chatDataService.handleSelectedModel(selectedSubModelName)
+      
+    }
+    else
+    {
+      console.log(55555,selectedModel);
+      
+    }
+  }
 
 
   onEnterPress(event: Event, textareaRef: HTMLTextAreaElement) {
@@ -70,7 +190,11 @@ export class ChatComponent implements OnInit {
 
 
 
-  constructor(private chatService: ChatService, private router: Router, private route: ActivatedRoute, private chatDataService: ChatdataService) { }
+  constructor(
+    private chatService: ChatService, 
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private chatDataService: ChatdataService) { }
 
   ngOnInit(): void {
     this.routerSub = this.router.events.subscribe(event => {
@@ -128,6 +252,6 @@ export class ChatComponent implements OnInit {
     // ];
     this.showChatDetail = true;
     this.chatService.clearMessage();
-    this.chatService.sendMessage( messageId);
+    this.chatService.sendMessage(messageId);
   }
 }

@@ -26,6 +26,7 @@ export class ChatdataService {
   private itemsSubject = new BehaviorSubject<GroupedMessages>(this.loadFromLocalStorage());
   private currentIdSubject = new BehaviorSubject<string | null>(null); // 用于保存和广播当前选中的ID
   items$ = this.itemsSubject.asObservable();
+  selectedModel:BehaviorSubject<string>=new BehaviorSubject<string>(('GPT-3.5(默认)'))
 
   addItem(id: string, item: Message) {
   const currentItems = this.itemsSubject.value;
@@ -121,6 +122,11 @@ getItemsById(id: string): Observable<Message[]> {
       this.itemsSubject.next({ ...currentItems });
       this.saveToLocalStorage(currentItems);
     }
+   }
+
+   handleSelectedModel(model:string):void{
+    this.selectedModel.next(model)
+    console.log(model);
    }
 
 }

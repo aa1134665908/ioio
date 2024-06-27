@@ -1,7 +1,55 @@
 <ng-container *ngIf="!showChatDetail" div class="right-part">
-    <div class="header-box">
+    <div class="header-title-box">
+        <div class="model-groups" *ngFor="let model of modelGroup; let i = index"
+             [ngClass]="isCaptchaVisible === i ? 'model-group-select' : ''"
+             (click)="modelGroupSelect(i)"
+             (mouseenter)="onMouseEnter(i)"
+             (mouseleave)="scheduleHideDetails()">
+          <div>
+            <img [src]="model.imageUrl" class="model-img" [ngStyle]="getImageStyle(i)">
+            <span [ngStyle]="getTextStyle(i)">{{ model.name }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="model-select-box" *ngIf="isInitialLoad" 
+           (mouseenter)="clearHideDetailsTimeout()"
+           (mouseleave)="scheduleHideDetails()">
+        <div class="model-style">
+          <div class="model-select" *ngIf="hoveredIndex === 0">
+            <span class="model-title" style="font-size: 16px; font-weight: bold;">{{ modelGroup[0].title }}</span>
+            <p class="model-content">{{ modelGroup[0].content }}</p>
+          </div>
+          <div class="model-select" *ngIf="hoveredIndex === 1">
+            <span class="model-title" style="font-size: 16px; font-weight: bold;">{{ modelGroup[1].title }}</span>
+            <p class="model-content">{{ modelGroup[1].content }}</p>
+          </div>
+        </div>
+        <div *ngIf="hoveredIndex === 0">
+            <div *ngFor="let models of modelGroup[0].subModels; let i = index" class="model-name-box" (click)="selectModel(0, i)">
+            <div class="model-name" style="font-weight: bold;">
+              {{ models.name }}
+            </div>
+            <div *ngIf="modelGroup[0].selectedSubModelIndex === i">
+              <img src="../../assets/yes.svg" style="width: 14px; height: 14px;">
+            </div>
+          </div>
+        </div>
+        <div *ngIf="hoveredIndex === 1">
+            <div *ngFor="let models of modelGroup[1].subModels; let i = index" class="model-name-box" (click)="selectModel(1, i)">
+            <div class="model-name" style="font-weight: bold;">
+              {{ models.name }}
+            </div>
+            <div *ngIf="modelGroup[1].selectedSubModelIndex === i">
+              <img src="../../assets/yes.svg" style="width: 14px; height: 14px;">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    <!-- <div class="header-box">
         <div class="header-title-box">
-            <nz-segmented class="header-title" [nzOptions]="options" (nzValueChange)="handleIndexChange($event)"
+            <nz-segmented class="header-title" [nzOptions]="titleOptions" (nzValueChange)="handleIndexChange($event)"
                 nzBlock="true">
 
             </nz-segmented>
@@ -11,11 +59,16 @@
             <span *ngIf="isCaptchaVisible===0">gpt-3.5-turbo（默认）</span>
             <span *ngIf="isCaptchaVisible===1">gpt-4o</span>
         </div>
+        <div class="model-select">
+            <div style="padding: 20px 24px;">
+            <span style="font-size: 16px;font-weight: bold;">笨笨的，但能满足大多数任务</span>
+            </div>
+        </div>
         <img src="../../assets/icn_gpt3.5_off.png" alt="" class="gpt35-img"
             [ngClass]="{'gpt35-img-on':isCaptchaVisible===0}">
         <img src="../../assets/icn_gpt4_turbo_off.png" alt="" class="gpt4-img"
             [ngClass]="{'gpt4-img-on':isCaptchaVisible===1}">
-    </div>
+    </div> -->
     <div class="chat-background-box">
         <div class="chat-background">
             <img src="../../assets/oioi.png" alt="" class="ioio">
