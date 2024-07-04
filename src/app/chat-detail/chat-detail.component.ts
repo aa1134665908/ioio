@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, Renderer2 } from '@angular/core';
 import { ChatComponent } from '../chat/chat.component';
 import { ActivatedRoute } from '@angular/router';
-import { ChatService } from '../chat.service';
 import { ChatdataService } from '../chatdata.service';
 import { Observable, Subject, Subscription, of, takeUntil } from 'rxjs';
 import { MarkdownService } from 'ngx-markdown';
 import { Message } from "../chat-message.interface"
 import { KatexService } from '../katex.service';
 import { marked } from 'marked';
+import{AIManagerService}from '../aimanager.service'
 
 @Component({
 
@@ -28,7 +28,6 @@ export class ChatDetailComponent implements OnInit {
   private ngUnsubscribe = new Subject<void>();
 
   ngOnInit(): void {
-
     this.routeSubscription = this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       const id = params['id'];
       this.chatDataService.setCurrentId(id); // 将ID发送到服务
@@ -38,26 +37,27 @@ export class ChatDetailComponent implements OnInit {
         this.cdr.detectChanges(); // 触发变更检测
         setTimeout(() => this.wrapCodeBlocks(), 0);
       }
+      this.moduleTitle=this.chatDataService.getModelById(this.route.snapshot.params['id'])
+      console.log(33333,this.moduleTitle);
     });
-    this.streamCompleteSubscription = this.chatService.streamComplete$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+    this.streamCompleteSubscription = this.aimanagerService.streamComplete$.pipe(
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe(
       (completedId: string) => {
         if (completedId === this.route.snapshot.params['id']) {
           setTimeout(() => this.wrapCodeBlocks(), 0);
           setTimeout(() => this.setupMarkdownKatex(), 0);
-
-          this.isSending = false
-
+          this.isSending = false;
         }
       }
     );
 
-    this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
+    // this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
     setTimeout(() => this.scrollToBottom(), 0);
     setTimeout(() => this.setupMarkdownKatex(), 0);
   }
 
   constructor(
-    private chatService: ChatService,
     private chatComponent: ChatComponent,
     private chatDataService: ChatdataService,
     private route: ActivatedRoute,
@@ -66,11 +66,14 @@ export class ChatDetailComponent implements OnInit {
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private katexService: KatexService
+    private katexService: KatexService,
+    private aimanagerService:AIManagerService
   ) { }
 
 
   ngAfterViewInit() {
+    
+    
     const chatContainer = this.el.nativeElement.querySelector('.main');
     this.observer = new MutationObserver(() => {
       this.scrollToBottom();
@@ -255,9 +258,9 @@ export class ChatDetailComponent implements OnInit {
 
 
   ngOnDestroy() {
- 
+
     console.log('ChatDetailComponent destroyed.');
-    
+
     // 发出信号以取消所有使用 takeUntil 的订阅
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -277,11 +280,11 @@ export class ChatDetailComponent implements OnInit {
 
     // 重置组件状态
     this.chatComponent.showChatDetail = false;
-  
+
   }
 
   cancelRequest() {
-    this.chatService.cancelOngoingRequest();
+    this.aimanagerService.cancelOngoingRequest();
     this.isSending = false
   }
 
@@ -292,11 +295,8 @@ export class ChatDetailComponent implements OnInit {
     this.addItem(tempContent, 'user')
     this.content = ''
     this.isSending = true
-
-
-
-    this.chatService.clearMessage();
-    this.chatService.sendMessage(this.route.snapshot.params['id']);
+    
+    this.aimanagerService.sendMessage(this.route.snapshot.params['id'],this.moduleTitle);
 
 
   }

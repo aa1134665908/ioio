@@ -1,12 +1,15 @@
 import { Component, OnInit, } from '@angular/core';
-import { ChatService } from '../chat.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { ChatdataService } from '../chatdata.service';
 import { Subscription } from 'rxjs';
 import { Message } from "../chat-message.interface"
+import { AIManagerService } from '../aimanager.service';
 
 interface SubModel {
   name: string;
+  imageUrl?: string
+  value: string
+  available: boolean
 }
 
 interface ModelGroup {
@@ -15,7 +18,8 @@ interface ModelGroup {
   subModels: SubModel[];
   title?: string;
   content?: string;
-  selectedSubModelIndex?: number | null; 
+  selectedSubModelIndex?: number | null;
+
 }
 
 @Component({
@@ -30,41 +34,41 @@ export class ChatComponent implements OnInit {
       name: "ChatGPT",
       imageUrl: "../../assets/icn_gpt3.5_off.png",
       title: '当前地球上公布的 最聪明的 AI 模型 ',
-      content:'ChatGPT 是基于 OpenAI 的 GPT 系列模型开发的对话系统，能够理解和生成自然语言文本，广泛应用于聊天、问答、内容创作等场景，帮助用户解决各种问题并提供信息支持。',
+
+      content: 'ChatGPT 是基于 OpenAI 的 GPT 系列模型开发的对话系统，能够理解和生成自然语言文本，广泛应用于聊天、问答、内容创作等场景，帮助用户解决各种问题并提供信息支持。',
       subModels: [
-        { name: "GPT-3.5(默认)", },
-        { name: "GPT-4Turbo", },
-        { name: "GPT-4o", }
+        { name: "GPT-3.5", imageUrl: '../../assets/icn_gpt3.5_off.png', value: 'GPT-3.5', available: false },
+        { name: "GPT-4Turbo", imageUrl: '../../assets/icn_gpt3.5_off.png', value: 'GPT-4Turbo', available: false },
+        { name: "GPT-4o", imageUrl: '../../assets/icn_gpt3.5_off.png', value: 'GPT-4o', available: false }
       ],
       selectedSubModelIndex: 0
     },
     {
       name: "Other",
-      title:'其他不同能力的模型',
+      title: '其他不同能力的模型',
       imageUrl: "../../assets/icn_gpt4_turbo_off.png",
-      content:'更多实验性的模型，感受不一样的效果，注意此模式为探索性质，稳定性较弱',
+      content: '更多实验性的模型，感受不一样的效果，注意此模式为探索性质，稳定性较弱',
       subModels: [
-        { name: "deepseek-chat", },
-        { name: "deepseek-coder", }
+        { name: "deepseek-chat(默认)", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'deepseek-chat', available: true },
+        { name: "deepseek-coder", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'deepseek-coder', available: true }
       ],
       selectedSubModelIndex: null
     },
     // 你可以在这里添加更多主要模型
   ];
   hoveredIndex: number | null = null;
-  isMouseSelect:boolean=false
+  isMouseSelect: boolean = false
   isInitialLoad: boolean = false;
   hideDetailsTimeout: any;
   content: string = ""
   showChatDetail = false;
   private routerSub: Subscription = new Subscription();
-  isCaptchaVisible: number = 0;
-
-  titleOptions = ["ChatGPT", "Alpha"]
-
+  isCaptchaVisible: number = 1;
+  modelName: string = ''
+  isModelAvailable: boolean = true
 
   private enterPressCount = 0;
-  selectedModelIndex: number=0;
+  // selectedModelIndex: number=0;
 
   selectModel(groupIndex: number, subModelIndex: number): void {
     this.modelGroup.forEach((group, index) => {
@@ -74,8 +78,8 @@ export class ChatComponent implements OnInit {
     });
     // 设置当前选择的子模型
     this.modelGroup[groupIndex].selectedSubModelIndex = subModelIndex;
-    
-    this.sendSelectedSubModelName(groupIndex,subModelIndex)
+
+    this.sendSelectedSubModelName(groupIndex)
   }
 
   modelGroupSelect(index: number): void {
@@ -116,7 +120,7 @@ export class ChatComponent implements OnInit {
     this.hideDetailsTimeout = setTimeout(() => {
       this.hoveredIndex = null;
       // this.isCaptchaVisible = -1;
-      this.isInitialLoad =false
+      this.isInitialLoad = false
     }, 300); // 延迟300毫秒
   }
 
@@ -127,26 +131,27 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  sendSelectedSubModelName(groupIndex: number,selectedModelIndex:number) {
+  sendSelectedSubModelName(groupIndex: number) {
     // 获取当前选择的模型
     const selectedModel = this.modelGroup[groupIndex];
-  
+
     // 检查 selectedSubModelIndex 是否有效
-    if (typeof selectedModel.selectedSubModelIndex === 'number' ) {
+    if (typeof selectedModel.selectedSubModelIndex === 'number') {
       // 获取当前选择的子模型
       const selectedSubModel = selectedModel.subModels[selectedModel.selectedSubModelIndex];
-  
+
       // 获取当前选择的子模型的名称
-      const selectedSubModelName = selectedSubModel.name;
-  
+      const selectedSubModelName = selectedSubModel.value;
+
       // 调用服务函数，并传递当前选择的子模型名称
       this.chatDataService.handleSelectedModel(selectedSubModelName)
-      
+
+      this.modelName = this.chatDataService.getSelectedModel()
+      this.isModelAvailable=selectedSubModel.available
     }
-    else
-    {
-      console.log(55555,selectedModel);
-      
+    else {
+      console.log('模型选择错误', selectedModel);
+
     }
   }
 
@@ -191,10 +196,12 @@ export class ChatComponent implements OnInit {
 
 
   constructor(
-    private chatService: ChatService, 
-    private router: Router, 
-    private route: ActivatedRoute, 
-    private chatDataService: ChatdataService) { }
+
+    private router: Router,
+    private route: ActivatedRoute,
+    private chatDataService: ChatdataService,
+    private aimanagerService: AIManagerService
+  ) { }
 
   ngOnInit(): void {
     this.routerSub = this.router.events.subscribe(event => {
@@ -205,6 +212,8 @@ export class ChatComponent implements OnInit {
 
     // 初始化时检查当前路径
     this.updateShowChatDetail();
+    this.selectModel(1, 0)
+
   }
 
   private updateShowChatDetail(): void {
@@ -229,7 +238,7 @@ export class ChatComponent implements OnInit {
       content: content, // 固定内容
       role: role
     }; // 创建新项
-    this.chatDataService.addItem(id, newMessage); // 调用服务的方法添加新项
+    this.chatDataService.addItem(id, newMessage, this.chatDataService.getSelectedModel()); // 调用服务的方法添加新项
   }
 
 
@@ -240,18 +249,8 @@ export class ChatComponent implements OnInit {
     this.addItem(messageId, tempContent, 'user')
     this.router.navigate([messageId], { relativeTo: this.route });
     this.content = ''
-    // const messages = [
-    //   {
-    //     "content": "You are ChatGPT, a large language model trained by OpenAI, based on the gpt-4o(omni) architecture.Knowledge cutoff: 2023-10",
-    //     "role": "system"
-    //   },
-    //   {
-    //     "content": tempContent,
-    //     "role": "user"
-    //   }
-    // ];
     this.showChatDetail = true;
-    this.chatService.clearMessage();
-    this.chatService.sendMessage(messageId);
+
+    this.aimanagerService.sendMessage(messageId, this.chatDataService.getSelectedModel());
   }
 }
