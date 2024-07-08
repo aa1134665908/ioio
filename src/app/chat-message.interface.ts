@@ -8,5 +8,5 @@ export interface Message {
 export interface AIService {
   sendMessage(id: string, model?: string): void;
   cancelOngoingRequest(): void;
-  streamComplete$: Observable<string>;
+  
 }

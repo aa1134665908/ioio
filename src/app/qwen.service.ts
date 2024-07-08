@@ -1,30 +1,27 @@
 import { Injectable } from '@angular/core';
 import { AIService, Message } from './chat-message.interface'
-import { map, take, tap } from 'rxjs';
+import { map, Subject, take, tap } from 'rxjs';
 import { ChatdataService } from './chatdata.service';
-
-
-
 
 @Injectable({
   providedIn: 'root'
 })
-export class DeepseekService implements AIService {
-  private apiUrl = 'https://api.deepseek.com/v1/chat/completions';
+export class QwenService implements AIService{
+  private apiUrl = '/aliyun-api/compatible-mode/v1/chat/completions';
   private abortController: AbortController | null = null;
+
+
 
   constructor(
     private chatdataService: ChatdataService,
-   
 
   ) { }
-
-  sendMessage(id: string, model: string = 'deepseek-chat'): void {
+  sendMessage(id: string, model: string = 'qwen-plus'): void {
     this.chatdataService.getItemsById(id).pipe(
       take(1),
       map(messages => {
         const systemMessage: Message = {
-          content: "You are a helpful assistant",
+          content: "You are a helpful assistant.",
           role: "system"
         };
         return this.trimMessages([systemMessage, ...messages]);
@@ -34,27 +31,30 @@ export class DeepseekService implements AIService {
         const data = {
           "messages": trimmedMessages,
           "model": model,
-          "max_tokens": 2048,
-          "stop": null,
+          // "max_tokens": 1500,
+          // 'seed' : 5555,
+          
           "stream": true,
         };
         console.log('Trimmed messages:', JSON.stringify(data, null, 2));
         const headers = new Headers({
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream',
-          'Authorization': 'Bearer sk-e7a82dd7b0a4471b8705fea2608fd60e'
+          'Authorization': 'Bearer sk-5a632587d68c49009fa930cabe72cda1',
+          
         });
 
         this.cancelOngoingRequest();
-        
         this.abortController = new AbortController();
 
         fetch(this.apiUrl, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify(data),
-          credentials: 'include',
-          signal: this.abortController.signal
+          // credentials: 'same-origin',
+          signal: this.abortController.signal,
+          // mode: 'no-cors'
+          
         }).then(response => {
           if (response.ok && response.body) {
             const reader = response.body.getReader();
@@ -63,8 +63,9 @@ export class DeepseekService implements AIService {
             const readStream = (): void => {
               reader.read().then(({ done, value }) => {
                 if (done) {
-                  
                   this.chatdataService.completeStream(id)
+                  console.log('已完成');
+                  
                   this.abortController = null;
                   return;
                 }
@@ -92,7 +93,10 @@ export class DeepseekService implements AIService {
                 } else {
                   console.error('Error in stream:', error);
                 }
+                
                 this.chatdataService.completeStream(id)
+                
+                
                 this.abortController = null;
               });
             };
@@ -103,19 +107,15 @@ export class DeepseekService implements AIService {
           }
         }).catch(error => {
           console.error('Error fetching stream:', error);
-          
         });
       })
     ).subscribe();
   }
 
   cancelOngoingRequest() {
-   
-    
     if (this.abortController) {
       this.abortController.abort();
       this.abortController = null;
-      
     }
   }
 
@@ -135,7 +135,8 @@ export class DeepseekService implements AIService {
       console.log('System message tokens:', systemTokens);
     }
 
-
+    // 先添加最新的消息
+    // const nonSystemMessages = messages.filter(m => m.role !== 'system').reverse();
 
     for (let i = 0; i < nonSystemMessages.length; i++) {
       const message = nonSystemMessages[i];
@@ -185,6 +186,5 @@ export class DeepseekService implements AIService {
     return Math.max(1, Math.ceil(tokenCount));
   }
 
-
-
+  
 }

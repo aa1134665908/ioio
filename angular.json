@@ -72,6 +72,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "browserTarget": "ioio:build:production"
@@ -104,7 +107,6 @@
               "src/styles.less",
               "node_modules/prismjs/themes/prism-okaidia.css",
               "node_modules/katex/dist/katex.min.css"
-              
             ],
             "scripts": [
               "node_modules/prismjs/prism.js",
@@ -127,7 +129,6 @@
               "node_modules/prismjs/components/prism-css.min.js",
               "node_modules/prismjs/components/prism-sass.min.js",
               "node_modules/prismjs/components/prism-less.min.js"
-              
             ]
           }
         }

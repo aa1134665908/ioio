@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, Renderer2 } from '@angular/core';
 import { ChatComponent } from '../chat/chat.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChatdataService } from '../chatdata.service';
-import { Observable, Subject, Subscription, of, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription, filter, of, takeUntil } from 'rxjs';
 import { MarkdownService } from 'ngx-markdown';
 import { Message } from "../chat-message.interface"
 import { KatexService } from '../katex.service';
 import { marked } from 'marked';
-import{AIManagerService}from '../aimanager.service'
+import { AIManagerService } from '../aimanager.service'
 
 @Component({
 
@@ -18,44 +18,61 @@ import{AIManagerService}from '../aimanager.service'
 })
 export class ChatDetailComponent implements OnInit {
   private observer: MutationObserver | null = null;
+  public isUserScrolling: boolean = false;
+  public isClickbtn:boolean=false
   content: string = ''
   moduleTitle: string = ''
   private routeSubscription: Subscription = new Subscription(); // 新增的订阅变量
   items$: Observable<Message[]> = of([]);
   copyFeedbackButton: HTMLButtonElement | null = null;
-  private streamCompleteSubscription: Subscription | undefined;
-  isSending: boolean = false
+
   private ngUnsubscribe = new Subject<void>();
+  private lastScrollTop: number = 0;
 
   ngOnInit(): void {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.ngUnsubscribe)
+    ).subscribe(() => {
+      this.handleRouteChange();
+    });
+
+    // 初始化组件
+    this.handleRouteChange();
+
     this.routeSubscription = this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(params => {
       const id = params['id'];
       this.chatDataService.setCurrentId(id); // 将ID发送到服务
+
       if (id) {
 
         this.items$ = this.chatDataService.getItemsById(id);
         this.cdr.detectChanges(); // 触发变更检测
         setTimeout(() => this.wrapCodeBlocks(), 0);
       }
-      this.moduleTitle=this.chatDataService.getModelById(this.route.snapshot.params['id'])
-      console.log(33333,this.moduleTitle);
+      this.moduleTitle = this.chatDataService.getModelById(this.route.snapshot.params['id'])
+
     });
-    this.streamCompleteSubscription = this.aimanagerService.streamComplete$.pipe(
+
+
+
+
+    this.chatDataService.streamComplete$.pipe(
       takeUntil(this.ngUnsubscribe)
-    ).subscribe(
-      (completedId: string) => {
-        if (completedId === this.route.snapshot.params['id']) {
-          setTimeout(() => this.wrapCodeBlocks(), 0);
-          setTimeout(() => this.setupMarkdownKatex(), 0);
-          this.isSending = false;
-        }
+    ).subscribe((completedId: string) => {
+      if (completedId === this.route.snapshot.params['id']) {
+        this.handleStreamComplete();
       }
-    );
+    });
 
     // this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
-    setTimeout(() => this.scrollToBottom(), 0);
-    setTimeout(() => this.setupMarkdownKatex(), 0);
+    // this.scrollToBottom()
+    this.setupMarkdownKatex()
+    
+
   }
+
+
 
   constructor(
     private chatComponent: ChatComponent,
@@ -67,20 +84,65 @@ export class ChatDetailComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private katexService: KatexService,
-    private aimanagerService:AIManagerService
+    public aimanagerService: AIManagerService,
+    private router: Router,
   ) { }
 
+  private currentChatId: string | undefined;
+
+  private handleRouteChange(): void {
+    const newId = this.route.snapshot.params['id'];
+    console.log('Route changed, new id:', newId);
+  
+    if (this.currentChatId && this.currentChatId !== newId) {
+      // 只有在切换到不同的聊天时才取消请求
+      console.log('Switching to a different chat, cancelling current request');
+      this.cancelRequest();
+      this.aimanagerService.isSending = false;
+    }
+  
+    this.currentChatId = newId;
+  
+    // 初始化聊天
+    this.moduleTitle = this.chatDataService.getModelById(newId);
+  }
+  
+
+  private handleStreamComplete() {
+    setTimeout(() => this.wrapCodeBlocks(), 0);
+    setTimeout(() => this.setupMarkdownKatex(), 0);
+    this.aimanagerService.isSending = false;
+    console.log('Stream completed, isSending:', this.aimanagerService.isSending);
+    this.isUserScrolling = false;
+    this.isClickbtn=false
+  }
 
   ngAfterViewInit() {
-    
-    
     const chatContainer = this.el.nativeElement.querySelector('.main');
     this.observer = new MutationObserver(() => {
-      this.scrollToBottom();
+      if (!this.isUserScrolling) {
+        this.scrollToBottom();
+      }
     });
-
+  
     this.observer.observe(chatContainer, { childList: true, subtree: true });
+  
+    // 改进的滚动事件监听器
+    chatContainer.addEventListener('scroll', () => {
+      // 检查滚动位置是否发生了变化
+      if (chatContainer.scrollTop != this.lastScrollTop) {
+        // 检查是否不在底部
+        const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop === chatContainer.clientHeight;
+        if (!isAtBottom) {
+          this.isUserScrolling = true;
+          this.isClickbtn=false
+          console.log('User scrolling detected');
+        }
+      }
+      this.lastScrollTop = chatContainer.scrollTop;
+    });
   }
+  
 
   private wrapCodeBlocks() {
     this.ngZone.run(() => {
@@ -126,8 +188,8 @@ export class ChatDetailComponent implements OnInit {
         }
       });
 
-      setTimeout(() => this.scrollToBottom(), 0);
-      this.cdr.detectChanges();
+      // setTimeout(() => this.scrollToBottom(), 0);
+      // this.cdr.detectChanges();
       // console.log('Finished wrapCodeBlocks');
     });
   }
@@ -259,19 +321,19 @@ export class ChatDetailComponent implements OnInit {
 
   ngOnDestroy() {
 
-    console.log('ChatDetailComponent destroyed.');
+    this.cancelRequest()
 
     // 发出信号以取消所有使用 takeUntil 的订阅
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
 
+
+
     // 取消特定的订阅（如果还需要的话）
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
-    if (this.streamCompleteSubscription) {
-      this.streamCompleteSubscription.unsubscribe();
-    }
+
 
     // 断开 MutationObserver 连接
     if (this.observer) {
@@ -280,12 +342,12 @@ export class ChatDetailComponent implements OnInit {
 
     // 重置组件状态
     this.chatComponent.showChatDetail = false;
-
+    console.log('ChatDetailComponent destroyed.');
   }
 
   cancelRequest() {
     this.aimanagerService.cancelOngoingRequest();
-    this.isSending = false
+    // this.isSending = false
   }
 
 
@@ -294,9 +356,13 @@ export class ChatDetailComponent implements OnInit {
     const tempContent = this.content;
     this.addItem(tempContent, 'user')
     this.content = ''
-    this.isSending = true
-    
-    this.aimanagerService.sendMessage(this.route.snapshot.params['id'],this.moduleTitle);
+    // this.isSending = true
+
+    this.aimanagerService.isSending = true;
+
+    this.aimanagerService.cancelOngoingRequest();
+
+    this.aimanagerService.sendMessage(this.route.snapshot.params['id'], this.moduleTitle);
 
 
   }
@@ -315,5 +381,12 @@ export class ChatDetailComponent implements OnInit {
     this.chatDataService.addItem(this.route.snapshot.params['id'], newMessage); // 调用服务的方法添加新项
   }
 
+
+  scroll_btn(){
+    this.scrollToBottom()
+    this.isUserScrolling=!this.isUserScrolling
+    this.isClickbtn=true
+    
+  }
 
 }

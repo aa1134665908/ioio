@@ -50,7 +50,9 @@ export class ChatComponent implements OnInit {
       content: '更多实验性的模型，感受不一样的效果，注意此模式为探索性质，稳定性较弱',
       subModels: [
         { name: "deepseek-chat(默认)", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'deepseek-chat', available: true },
-        { name: "deepseek-coder", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'deepseek-coder', available: true }
+        { name: "deepseek-coder", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'deepseek-coder', available: true },
+        { name: "qwen1.5-110b-chat", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'qwen1.5-110b-chat', available: true },
+        { name: "qwen-plus", imageUrl: '../../assets/icn_gpt4_turbo_off.png', value: 'qwen-plus', available: true }
       ],
       selectedSubModelIndex: null
     },
@@ -78,7 +80,8 @@ export class ChatComponent implements OnInit {
     });
     // 设置当前选择的子模型
     this.modelGroup[groupIndex].selectedSubModelIndex = subModelIndex;
-
+    
+    
     this.sendSelectedSubModelName(groupIndex)
   }
 
@@ -112,6 +115,8 @@ export class ChatComponent implements OnInit {
   onMouseEnter(index: number): void {
     this.modelGroupSelect(index)
     this.hoveredIndex = index;
+    console.log(this.modelGroup[this.hoveredIndex].name);
+    
     this.isMouseSelect = true;
     this.clearHideDetailsTimeout();
   }
@@ -125,6 +130,8 @@ export class ChatComponent implements OnInit {
   }
 
   clearHideDetailsTimeout(): void {
+    
+    
     if (this.hideDetailsTimeout) {
       clearTimeout(this.hideDetailsTimeout);
       this.hideDetailsTimeout = null;
@@ -206,10 +213,12 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.routerSub = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
+
+        
         this.updateShowChatDetail();
       }
     });
-
+    
     // 初始化时检查当前路径
     this.updateShowChatDetail();
     this.selectModel(1, 0)
@@ -247,10 +256,14 @@ export class ChatComponent implements OnInit {
     const tempContent = this.content;
     const messageId = this.generateUniqueId();
     this.addItem(messageId, tempContent, 'user')
+    
     this.router.navigate([messageId], { relativeTo: this.route });
     this.content = ''
     this.showChatDetail = true;
-
+    this.aimanagerService.isSending = true;
+    
+    // this.aimanagerService.cancelOngoingRequest();
     this.aimanagerService.sendMessage(messageId, this.chatDataService.getSelectedModel());
+
   }
 }

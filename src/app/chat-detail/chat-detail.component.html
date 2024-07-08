@@ -2,7 +2,7 @@
   <div class="chat-title">
     <div class="model-title">
       <img
-        [src]="moduleTitle === 'gpt-3.5-turbo（默认）' ? '../../assets/icn_gpt3.5_off.png' : '../../assets/icn_gpt4_turbo_off.png'"
+        [src]="moduleTitle === 'GPT-3.5' ? '../../assets/icn_gpt3.5_off.png' : '../../assets/icn_gpt4_turbo_off.png'"
         alt="">
       {{moduleTitle}}
     </div>
@@ -43,16 +43,19 @@
   </div>
   <div class="bottom">
     <div class="chat-input">
+      <div class="scroll-btn" *ngIf="isUserScrolling && !isClickbtn" (click)="scroll_btn()">
+        <img src="../../assets/bottom_arrow.png" alt="" style="width: 14px;">
+      </div>
       <textarea nz-input placeholder="输入内容，Shift + Enter 换行" [nzAutosize]="{ minRows: 1, maxRows: 6 }"
         [nzBorderless]="true" [(ngModel)]="content" #textareaRef
         (keydown.enter)="onEnterPress($event, textareaRef)"></textarea>
-      <div *ngIf="content===''&&isSending===false" class="submit-img submit-img-disabled">
+      <div *ngIf="content===''&&aimanagerService.isSending===false" class="submit-img submit-img-disabled">
         <img src="../../assets/arrow.svg">
       </div>
-      <div *ngIf="content!==''&&isSending===false" class="submit-img" (click)="sendMessage()">
+      <div *ngIf="content!==''&&aimanagerService.isSending===false" class="submit-img" (click)="sendMessage()">
         <img src="../../assets/arrow.svg">
       </div>
-      <div *ngIf="isSending===true" (click)="cancelRequest()" class="stopSend" nz-tooltip nzTooltipTitle="停止回复">
+      <div *ngIf="aimanagerService.isSending===true" (click)="cancelRequest()" class="stopSend" nz-tooltip nzTooltipTitle="停止回复">
         <div class="stopSendPolit"></div>
       </div>
 

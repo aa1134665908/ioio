@@ -1,0 +1,10 @@
+{
+    "/aliyun-api": {
+      "target": "https://dashscope.aliyuncs.com",
+      "secure": true,
+      "changeOrigin": true,
+      "pathRewrite": {
+        "^/aliyun-api": ""
+      }
+    }
+  }

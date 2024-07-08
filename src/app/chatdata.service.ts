@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { Message } from "./chat-message.interface"
 
@@ -27,10 +27,13 @@ export class ChatdataService {
   private currentIdSubject = new BehaviorSubject<string | null>(null); // 用于保存和广播当前选中的ID
   items$ = this.itemsSubject.asObservable();
   selectedModel: BehaviorSubject<string> = new BehaviorSubject<string>(('deepseek-chat(默认)'))
-
+  private streamCompleteSubject = new Subject<string>();
+  public streamComplete$ = this.streamCompleteSubject.asObservable();
   
 
-  
+  completeStream(id: string) {
+    this.streamCompleteSubject.next(id);
+  }
 
   addItem(id: string, item: Message, model?: string) {
     const currentItems = this.itemsSubject.value;
@@ -151,7 +154,7 @@ export class ChatdataService {
 
   handleSelectedModel(model: string): void {
     this.selectedModel.next(model)
-    console.log(666666, this.selectedModel.value);
+    // console.log(666666, this.selectedModel.value);
   }
   getSelectedModel(): string {
     return this.selectedModel.value
