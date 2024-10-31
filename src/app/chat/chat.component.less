@@ -1,7 +1,8 @@
-.right-part {
+.chat-box {
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
 }
 
 .header-box {
@@ -22,7 +23,7 @@
     background: #ebf0f2;
     padding: 4px;
     border-radius: 10px;
-   
+
 }
 
 .header-title {
@@ -64,15 +65,19 @@
     display: flex;
     align-items: center;
      opacity: .6;
-    
+
 }
 
 .bottom {
     display: flex;
     justify-content: center;
     width: 100%;
-    flex: 1;
-    padding-top: 46px;
+    align-items: center;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 
@@ -139,6 +144,19 @@ textarea {
     cursor: default;
 }
 
+.rows-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.rows-container .submit-img {
+  position: initial;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
 .model-groups{
     height: 40px;
     width: 130px;
@@ -156,7 +174,7 @@ textarea {
 .model-group-select{
     background-color:  #ffffff;
     color: #000;
-  
+
 }
 .model-style{
     padding: 20px 24px;
@@ -178,7 +196,7 @@ textarea {
     border: 1px solid #E4EAED;
     border-radius: 10px;
     left: calc(50% - 8px);
-    
+
 }
 
 .model-select{
@@ -186,7 +204,7 @@ textarea {
     flex-direction: column;
     justify-content: center;
     text-align: center;
-    
+
 }
 
 .model-title {
@@ -195,7 +213,7 @@ textarea {
     display: block; /* 确保标题占据一整行 */
     text-align: center; /* 标题居中对齐 */
   }
-  
+
   .model-content {
     font-size: 12px;
     color: #9aa3b3;
@@ -220,5 +238,7 @@ textarea {
     justify-content: center;
     color: #9aa3b3;
     margin-top: 10px;
-   
+
 }
+
+

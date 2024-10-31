@@ -1,4 +1,5 @@
 <ng-container *ngIf="!showChatDetail" div class="right-part">
+  <div class='chat-box'>
   <div class="header-title-box">
     <div class="model-groups" *ngFor="let model of modelGroup; let i = index"
       [ngClass]="isCaptchaVisible === i ? 'model-group-select' : ''" (click)="modelGroupSelect(i)"
@@ -28,7 +29,7 @@
         (click)="selectModel(0, i)">
         <div class="model-name" style="font-weight: bold;">
           <img [src]="models.imageUrl" alt=""
-            style="width: 16px;height: 16px; 
+            style="width: 16px;height: 16px;
             filter: brightness(0) saturate(100%) invert(71%) sepia(17%) saturate(1354%) hue-rotate(137deg) brightness(89%) contrast(90%);
             margin-right: 5px;margin-bottom: 2px;">
           {{ models.name }}
@@ -44,7 +45,7 @@
         (click)="selectModel(1, i)">
         <div class="model-name" style="font-weight: bold;">
           <img [src]="models.imageUrl" alt=""
-            style="width: 16px;height: 16px; 
+            style="width: 16px;height: 16px;
             filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(1854%) hue-rotate(247deg) brightness(115%) contrast(88%);
             margin-right: 5px;margin-bottom: 2px;">
           {{ models.name }}
@@ -64,13 +65,17 @@
   </div>
 
   <div class="bottom">
-    <div class="chat-input">
-      <textarea nz-input  [placeholder]="isModelAvailable ? '输入内容，Shift + Enter 换行' : '模型维护中，暂时无法使用'" [nzAutosize]="{ minRows: 1, maxRows: 6 }"
-        [nzBorderless]="true" 
-        [(ngModel)]="content" 
+    <div class="chat-input"  [class.rows-container]="textWidth>430">
+      <textarea nz-input
+        [placeholder]="isModelAvailable ? '输入内容，Shift + Enter 换行' : '模型维护中，暂时无法使用'"
+        [nzAutosize]="{ minRows: 1, maxRows: 6 }"
+        [nzBorderless]="true"
+        [(ngModel)]="content"
         #textareaRef
         (keydown.enter)="onEnterPress($event, textareaRef)"
-        [disabled]="!isModelAvailable"></textarea>
+        (input)="onMessageInput()"
+        [disabled]="!isModelAvailable">
+      </textarea>
       <div *ngIf="content===''" class="submit-img submit-img-disabled">
         <img src="../../assets/arrow.svg">
       </div>
@@ -80,9 +85,10 @@
       </div>
 
     </div>
-
+    <div class="statement">IOIO 基于 AI 技术生成内容的准确性和完整性无法保证，不代表我们的态度和观点。</div>
   </div>
-  <div class="statement">IOIO 基于 AI 技术生成内容的准确性和完整性无法保证，不代表我们的态度和观点。</div>
+  </div>
+
 </ng-container>
 
 <router-outlet></router-outlet>

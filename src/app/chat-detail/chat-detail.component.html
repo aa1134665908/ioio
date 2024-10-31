@@ -34,7 +34,7 @@
               <div class="trash">
                 <img src="../../assets/trash.svg"alt="" (click)="deleteMessage(i)">
               </div>
-             
+
             </div>
           </div>
         </div>
@@ -42,13 +42,13 @@
     </div>
   </div>
   <div class="bottom">
-    <div class="chat-input">
+    <div class="chat-input"  [class.rows-container]="textWidth>430">
       <div class="scroll-btn" *ngIf="isUserScrolling && !isClickbtn" (click)="scroll_btn()">
         <img src="../../assets/bottom_arrow.png" alt="" style="width: 14px;">
       </div>
       <textarea nz-input placeholder="输入内容，Shift + Enter 换行" [nzAutosize]="{ minRows: 1, maxRows: 6 }"
         [nzBorderless]="true" [(ngModel)]="content" #textareaRef
-        (keydown.enter)="onEnterPress($event, textareaRef)"></textarea>
+        (keydown.enter)="onEnterPress($event, textareaRef)"(input)="onMessageInput()"></textarea>
       <div *ngIf="content===''&&aimanagerService.isSending===false" class="submit-img submit-img-disabled">
         <img src="../../assets/arrow.svg">
       </div>

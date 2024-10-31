@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ChatComponent } from '../chat/chat.component';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChatdataService } from '../chatdata.service';
@@ -28,6 +28,9 @@ export class ChatDetailComponent implements OnInit {
 
   private ngUnsubscribe = new Subject<void>();
   private lastScrollTop: number = 0;
+
+  textWidth = 0;
+  @ViewChild('textareaRef') textareaRef!: ElementRef;
 
   ngOnInit(): void {
     this.router.events.pipe(
@@ -68,7 +71,7 @@ export class ChatDetailComponent implements OnInit {
     // this.chatComponent.isCaptchaVisible === 0 ? this.moduleTitle = 'gpt-3.5-turbo（默认）' : this.moduleTitle = 'gpt-4o'
     // this.scrollToBottom()
     this.setupMarkdownKatex()
-    
+
 
   }
 
@@ -93,20 +96,21 @@ export class ChatDetailComponent implements OnInit {
   private handleRouteChange(): void {
     const newId = this.route.snapshot.params['id'];
     console.log('Route changed, new id:', newId);
-  
+
     if (this.currentChatId && this.currentChatId !== newId) {
       // 只有在切换到不同的聊天时才取消请求
       console.log('Switching to a different chat, cancelling current request');
+      this.content=''
       this.cancelRequest();
       this.aimanagerService.isSending = false;
     }
-  
+
     this.currentChatId = newId;
-  
+
     // 初始化聊天
     this.moduleTitle = this.chatDataService.getModelById(newId);
   }
-  
+
 
   private handleStreamComplete() {
     setTimeout(() => this.wrapCodeBlocks(), 0);
@@ -124,9 +128,9 @@ export class ChatDetailComponent implements OnInit {
         this.scrollToBottom();
       }
     });
-  
+
     this.observer.observe(chatContainer, { childList: true, subtree: true });
-  
+
     // 改进的滚动事件监听器
     chatContainer.addEventListener('scroll', () => {
       // 检查滚动位置是否发生了变化
@@ -142,7 +146,7 @@ export class ChatDetailComponent implements OnInit {
       this.lastScrollTop = chatContainer.scrollTop;
     });
   }
-  
+
 
   private wrapCodeBlocks() {
     this.ngZone.run(() => {
@@ -386,7 +390,28 @@ export class ChatDetailComponent implements OnInit {
     this.scrollToBottom()
     this.isUserScrolling=!this.isUserScrolling
     this.isClickbtn=true
-    
+
+  }
+
+  onMessageInput() {
+    if (this.textareaRef) {
+      const textarea = this.textareaRef.nativeElement;
+      this.textWidth = this.getTextWidth(
+        textarea.value,
+        getComputedStyle(textarea)
+      );
+      // console.log('Current text width:', this.textWidth);
+    }
+  }
+
+  private getTextWidth(text: string, font: CSSStyleDeclaration): number {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (context) {
+      context.font = font.font;
+      return context.measureText(text).width;
+    }
+    return 0;
   }
 
 }
